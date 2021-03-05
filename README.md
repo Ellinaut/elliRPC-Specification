@@ -39,11 +39,9 @@ Servers MUST ignore properties which they don't know.
 All names MUST be interpreted case-sensitive. Schema names SHOULD be written as UpperCamelCase, all other names SHOULD
 be written as lowerCamelCase.
 
-Package, procedure, schema and property names SHOULD NOT begin with an underscore, as this is reserved for internal
-names within this specification.
-
-Official extensions for *elliRPC* (provided by Ellinaut or in direct consultation) MAY use the underscore followed by
-*elli* as naming prefix for their names: `_elli*`.
+Package, procedure, schema and property names from your application MUST NOT begin with an underscore or an @-sign, as
+these signs are reserved for internal names within this specification and official extensions provided by Ellinaut
+itself or in direct consultation.
 
 ## Packages and Procedures
 
@@ -53,8 +51,87 @@ execution result for this procedure from the server.
 A `package` is a context within the application. *elliRPC* provides procedures grouped by `packages`, which make it
 possible to use the same procedure name in multiple contexts.
 
-Every `procedure` MUST be assigned to a `package`. If your application does not use multiple packages, `_app` MAY be
-used as default package or for all procedures which shouldn't have a package within your application.
+Every `procedure` MUST be assigned to a `package`. If your application does not use multiple packages, `@app` MAY be
+used as default package name or for all procedures which shouldn't have a package within your application.
+
+```
+{
+    "name": {packageName},
+    "description": {packageDescription}|null,
+    "procedures": [
+        {
+            "name": {procedureName},
+            "description": {procedureDescription}|null,
+            "methods": {listOfAllowedHttpMethods},
+            "contentTypes": {listOfPossibleContentTypes},
+            "request": {
+                "data": {
+                    "context": {schemaContext}|null,
+                    "schema": {schemaName},
+                    "wrappedBy": {
+                        "context": {schemaContext}|null,
+                        "schema": {schemaName}
+                    },
+                },
+                "paginatedBy": {
+                    "context": {schemaContext}|null,
+                    "schema": {schemaName}
+                },
+                "sortedBy": {
+                    {option}: {description}
+                }
+            },
+            "response": {
+                "context": {schemaContext}|null,
+                "schema": {schemaName},
+                "wrappedBy": {
+                    "context": {schemaContext}|null,
+                    "schema": {schemaName}
+                }
+            }
+        }
+    ]
+}
+```
+
+### PackageDefinition
+
+| Property    | Type                  | Description                                                               |
+| ----------- | --------------------- | ------------------------------------------------------------------------- |
+| name        | string                | The name of the package.                                                  |
+| description | string or null        | The human readable description of the package for documentation purposes. |
+| procedures  | ProcedureDefinition[] | The procedures provided by this package.                                  |
+
+### ProcedureDefinition
+
+| Property     | Type                            | Description                                                                               |
+| ------------ | ------------------------------- | ----------------------------------------------------------------------------------------- |
+| name         | string                          | The name of the procedure.                                                                |
+| description  | string or null                  | The description of the procedure for documentation purposes.                              |
+| methods      | string[]                        | A list of possible http methods to call the procedure. Methods MUST be written UPPERCASE. |
+| contentTypes | string[]                        | A list of possible content types for the response of this procedure.                      |
+| request      | ProcedureRequestDefinition      | The definition of the procedure request.                                                  |
+| response     | ProcedureDataDefinition or null | The reference to the schema and possibly a wrapper used for the procedure response.       |
+
+### ProcedureRequestDefinition
+
+| Property    | Type                              | Description                                                                                                   |
+| ----------- | --------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| data        | ProcedureDataDefinition or null   | The reference to the schema and possibly a wrapper used to transfer data within the request to the procedure. |
+| paginatedBy | SchemaReferenceDefinition or null | The reference to the schema used for pagination.                                                              |
+| sortedBy    | string[]                          | A list of sort options where the key is the option and the value a description for documentation purposes.    |
+
+<strong>Note:</strong> One of the default pagination schemas (`@ContextBasedPagination` or `@OffsetBasedPagination`) MAY
+be used for pagination. For context based pagination the schema `@ContextBasedPagination` SHOULD be used, for offset
+based pagination the schema `@OffsetBasedPagination` SHOULD be used.
+
+### ProcedureDataDefinition
+
+| Property  | Type                              | Description                                                                          |
+| --------- | --------------------------------- | ------------------------------------------------------------------------------------ |
+| context   | string or null                    | The context MUST be `null` for `elliRPC` or an IRI for an external `JSON LD` schema. |
+| schema    | string                            | The case sensitive name of (internal or external) schema, which should be extended.  |
+| wrappedBy | SchemaReferenceDefinition or null | The schema reference to the schema, which is used as wrapper.                        |
 
 ## Schemas
 
@@ -110,7 +187,7 @@ definition. These options define how to interpret and use a type in the json str
 | name        | string                            | The name of the schema, which is used as type.                  |
 | abstract    | boolean                           | Indicates that this schema can only be used with other schemas. |
 | extends     | SchemaReferenceDefinition or null | The schema, which is extended with this schema.                 |
-| description | string                            | The description of the schema for documentation purposes.       |
+| description | string or null                    | The description of the schema for documentation purposes.       |
 | properties  | PropertyDefinition[]              | A list of properties for the schema.                            |
 
 ### SchemaReferenceDefinition
@@ -317,11 +394,76 @@ JSON object created by this schema:
 }
 ```
 
+### Default Schemas
+
+#### @ContextBasedPagination
+
+This schema SHOULD be used for context based pagination.
+
+With context based pagination, a procedure will be called every time with the same context to retrieve always the next
+page of results with the next call with the same context. This could be useful for pagination with nosql databases which
+sometimes use database pointers instead of offsets and limits.
+
+```json
+{
+  "name": "@ContextBasedPagination",
+  "abstract": false,
+  "extends": null,
+  "description": "This schema SHOULD be used for context based pagination.",
+  "properties": [
+    {
+      "name": "context",
+      "description": "The pagination context should be a uuid, but could be any string value.",
+      "type": {
+        "context": null,
+        "type": "string",
+        "options": []
+      }
+    }
+  ]
+}
+```
+
+A pagination url parameter with this schema looks like: `?pagination[context]=5980b081-d06a-4fa6-8f57-2fd4eb574e1f`.
+
+#### @OffsetBasedPagination
+
+This schema SHOULD be used for offset based pagination.
+
+```json
+{
+  "name": "@OffsetBasedPagination",
+  "abstract": false,
+  "extends": null,
+  "description": "This schema SHOULD be used for offset based pagination.",
+  "properties": [
+    {
+      "name": "offset",
+      "description": "The offset for pagination.",
+      "type": {
+        "context": null,
+        "type": "integer",
+        "options": []
+      }
+    },
+    {
+      "name": "limit",
+      "description": "The limit (max results per page) for pagination.",
+      "type": {
+        "context": null,
+        "type": "integer",
+        "options": []
+      }
+    }
+  ]
+}
+```
+
+A pagination url parameter with this schema looks like: `?pagination[offset]=0&pagination[limit]=10`.
+
 ## Endpoint: Packages
 
 The packages' endpoint MUST respond with all available packages and their procedures.
-
-This endpoint SHOULD be used as leading documentation for all available *elliRPC* procedures.
 
 This endpoint MAY be used for automatically creation of api clients.
 
@@ -330,7 +472,13 @@ The url path for this endpoint MUST be `/elliRPC/_packages.{contentType}`.
 Possible values for `{contentType}` MUST be `html` and `json`. Implementations of this specification MAY offer more
 content types for this endpoint.
 
+This endpoint MUST respond with HTTP status `406 Not Acceptable` if an `Accept` header is given and does not match
+the `Content-Type` given via uri path.
+
 This endpoint MUST be accessible only via http method `GET`.
+
+The request MAY contain additional headers for example for caching or authorization, which are not parts of this
+specification. Unknown headers MUST be ignored by servers.
 
 ### Request (JSON)
 
@@ -338,71 +486,38 @@ This endpoint MUST be accessible only via http method `GET`.
 
 ### Response (JSON)
 
-```
+<strong>For response structure see example within section `Packages and Procedures`.</strong>
+
+The response MUST contain the full definition of all packages grouped by key `packages`:
+
+```json
 {
-    "packages": {
-        {packageName}: {
-            {procedureName}: {
-                "methods": {listOfAllowedHttpMethods},
-                "request": {
-                    "data": {
-                        "context": {schemaContext}|null,
-                        "schema": {schemaName},
-                        "wrappedBy": {
-                            "context": {schemaContext}|null,
-                            "schema": {schemaName}
-                        },
-                    },
-                    "paginatedBy": {
-                        "context": {schemaContext}|null,
-                        "schema": {schemaName}
-                    },
-                    "sortedBy": {
-                        {option}: {description}
-                    }
-                },
-                "response": {
-                    "context": {schemaContext}|null,
-                    "schema": {schemaName},
-                    "wrappedBy": {
-                        "context": {schemaContext}|null,
-                        "schema": {schemaName}
-                    }
-                }
-            }
-        }
-    }
+  "packages": []
 }
 ```
 
-@todo description for the package schema
+The response MUST be formatted with the requested `contentType` and MUST contain a correct `Content-Type` header.
 
-@todo: Definition for schemas: "_ContextBasedPagination" and "_OffsetBasedPagination"
-
-## Endpoint: Status
-
-### Request
-
-`GET /elliRPC/_status.json`
-
-### Response
-
-```
-{
-    "packages": {
-        {packageName}: {
-            {procedureName}: {
-                "status": {statusName},
-                "description": {description}|null
-            }
-        }
-    }
-}
-```
-
-@todo description for the status schema
+The response MAY contain additional headers for example for caching, which is not part of this specification. Unknown
+headers MUST be ignored by clients.
 
 ## Endpoint: Schema
+
+This endpoint MAY be used for automatically creation of api clients.
+
+The url path for this endpoint MUST be `/elliRPC/_schema/{schemaName}.{contentType}`, where `{schemaName}` is the
+case-sensitive name of the requested schema.
+
+Possible values for `{contentType}` MUST be `html` and `json`. Implementations of this specification MAY offer more
+content types for this endpoint.
+
+This endpoint MUST respond with HTTP status `406 Not Acceptable` if an `Accept` header is given and does not match
+the `Content-Type` given via uri path.
+
+This endpoint MUST be accessible only via http method `GET`.
+
+The request MAY contain additional headers for example for caching or authorization, which are not parts of this
+specification. Unknown headers MUST be ignored by servers.
 
 ### Request
 
@@ -410,25 +525,134 @@ This endpoint MUST be accessible only via http method `GET`.
 
 ### Response
 
-<strong>@see `Schema`</strong>
+<strong>For response structure see example within section `Schemas`.</strong>
+
+The response MUST contain the full schema definition for the requested schema.
+
+The response MUST be formatted with the requested `contentType` and MUST contain a correct `Content-Type` header.
+
+The response MAY contain additional headers for example for caching, which is not part of this specification. Unknown
+headers MUST be ignored by clients.
+
+## Endpoint: Documentation
+
+The documentation endpoint MUST respond with all available packages and their procedures and with all schemas defined
+within an application.
+
+This endpoint SHOULD be used as leading documentation and MAY be used for automatically creation of api clients.
+
+The url path for this endpoint MUST be `/elliRPC/_documentation.{contentType}`.
+
+Possible values for `{contentType}` MUST be `html` and `json`. Implementations of this specification MAY offer more
+content types for this endpoint.
+
+This endpoint MUST respond with HTTP status `406 Not Acceptable` if an `Accept` header is given and does not match
+the `Content-Type` given via uri path.
+
+This endpoint MUST be accessible only via http method `GET`.
+
+### Request
+
+`GET /elliRPC/_documentation.json`
+
+### Response
+
+```json
+{
+  "application": "elliRPC Example Application",
+  "contentTypes": [
+    "html",
+    "json"
+  ],
+  "description": "The elliRPC Example Application is used to demonstrate the elliRPC usage.",
+  "packages": [],
+  "schemas": []
+}
+```
+
+| Property     | Type                | Description                                                                              |
+| ------------ | ------------------- | ---------------------------------------------------------------------------------------- |
+| application  | string              | The name of the application.                                                             |
+| contentTypes | string[]            | A list of possible content types for endpoints `documentation`, `packages` and `schema`. |
+| description  | string or null      | The description of the whole application.                                                |
+| packages     | PackageDefinition[] | A list of all available packages within this application.                                |
+| schemas      | SchemaDefinition[]  | A list of all schemas defined within this application.                                   |
 
 ## Endpoint: Execute Procedure
 
-@todo description
+The `execute procedure` endpoint MUST respond as defined in the procedure definition. The response MUST be in the
+requested format (`contentType`) if that `contentType` is defined as available in definition. Otherwise, it MUST respond
+with http status `415 Unsupported Media Type`.
 
-Content-Type-Header (Request)
+The url path for this endpoint MUST be `/elliRPC/{packageName}/{procedureName}.{contentType}`.
 
-- application/json
-- application/x-www-form-urlencoded
-- multipart/form-data
+Possible values for `{contentType}` MUST be `html` and `json`. Implementations of this specification MAY offer more
+content types for this endpoint.
+
+This endpoint MUST respond with HTTP status `406 Not Acceptable` if an `Accept` header is given and does not match
+the `Content-Type` given via uri path.
+
+The request data MUST either be sent as request body or in the url below the url parameter `data`. The data SHOULD be
+sent as url parameter with http method `GET` or `DELETE` or as request body for http methods `POST`, `PATCH` or `PUT`.
+If the request has a body and an url parameter, the url parameter MUST be ignored by the server and only the body MUST
+be considered. Request data MUST be structured like defined by the procedure definition. The data MUST only consists of
+the defined properties. This endpoint MUST handle request body's depending on the HTTP `Content-Type` header, which MUST
+be one of `application/json` (also possible `application/ld+json`), `application/x-www-form-urlencoded`
+or `multipart/form-data`. If no `Content-Type` is specified by the request, `application/json` MUST be assumed
+as `Content-Type`. If another (unsupported) value for the `Content-Type` header is given, the server MUST respond with
+http status `415 Unsupported Media Type`.
+
+This endpoint MUST respond with HTTP status `400 Bad Request` if the request data does not match the defined schema or
+if package or procedure does not exist. The `404 Not Found` status is reserved for application logic of the procedures
+and MAY be used by a valid procedure itself. The response body MAY be null, if the procedure does not define a response
+and respond with a http status `201 Created`, `202 Accepted` or `204 No Content`.
+
+Pagination and Sorting MUST be given as url parameters `pagination` and `sort`, where `pagination` contains one or more
+elements defined by the schema given in procedure definition under `request:paginatedBy` and `sorting` contains a single
+value which is one of the keys defined in procedure definition under `request:sortedBy`.
+
+This endpoint MUST be accessible via http methods which are defined in the procedure definition.
+
+The request MAY contain additional headers for example for caching or authorization, which are not parts of this
+specification. Unknown headers MUST be ignored by servers.
 
 ### Request
 
 `{METHOD} /elliRPC/{packageName}/{procedureName}.{contentType}`
 
+example with pagination:
+`GET /elliRPC/@app/test.json?pagination[offset]=0&pagination[limit]=10`
+
+example with sorting:
+`GET /elliRPC/@app/test.json?sort=titleAsc`
+
+example with request data within url:
+`GET /elliRPC/@app/test.json?data[test]=test`
+
+example with request data as json:
+
+```
+POST /elliRPC/@app/test.json
+Content-Type: application/json
+
+{
+    "test": "test"
+}
+```
+
 ### Response
 
-@todo describe
+The response depends on the procedure definition, which defines the responded properties over the schema for the
+response, and the requested `contentType`.
+
+Empty responses are possible, if response is defined as `null` in the procedure definition.
+
+The response MUST only contain the properties defined by response schema.
+
+The response MUST be formatted with the requested `contentType` and MUST contain a correct `Content-Type` header.
+
+The response MAY contain additional headers for example for caching, which is not part of this specification. Unknown
+headers MUST be ignored by clients.
 
 ## Endpoint: Execute Procedures
 
@@ -439,12 +663,15 @@ POST /elliRPC/_bulk
 Content-Type: application/json
 
 {
-    "procedures": {
-        {procedureId}: {
-            "package": {packageName},
-            "procedure": {procedureName},
-            "request": {procedureRequest}
-        }
+    "transactions": {
+        {transactionId}: [
+            {
+                "procedureId": {procedureId},
+                "package": {packageName},
+                "procedure": {procedureName},
+                "request": {procedureRequest}
+            }
+        ]
     }
 }
 ```
@@ -455,31 +682,53 @@ Content-Type: application/json
 Content-Type: application/json
 
 {
-    "procedures": {
-        {procedureId}: {
-            "package": {packageName},
-            "procedure": {procedureName},
-            "status": {statusName},
-            "response": {procedureResponse}
-        }
+    "transactions": {
+        {transactionId}: [
+            {
+                "procedureId": {procedureId},
+                "package": {packageName},
+                "procedure": {procedureName},
+                "status": {statusName},
+                "response": {procedureResponse}
+            }
+        ]
     }
 }
 ```
 
-## Endpoint: Fetch File
+## Endpoint: Get File
 
-GET /elliRPC/_file/{name}.{extension}
+The `get file` endpoint MUST be called via http method `GET`.
+
+The url path for this endpoint MUST be `/elliRPC/@files/{fileName}`.
+
+The `fileName` SHOULD contain a file extension separated by a point (`.`) at the end. For example: `test.jpg`.
+
+The `fileName` MAY contain directories, which allows duplicated file names in different directories. Directories and at
+least the file name MUST be separated by slashes (`/`). For example: `/elliRPC/@files/testDirectory/test.jpg`.
+
+The request MAY contain additional headers for example for caching or authorization, which are not parts of this
+specification. Unknown headers MUST be ignored by servers.
+
+This endpoint MAY responds with the http header `Content-Disposition` to give a filename which MAY be different from the
+url filename.
+
+The response MUST contain a valid `Content-Type` header.
+
+The response MAY contain additional http header for example for caching, which is not part of this specification.
+Unknown headers MUST be ignored by clients.
+
+If a file could not be found on the server, the server MUST respond with http status `404 Not Found`.
 
 ## Endpoint: Upload File
 
-@todo 
+@todo
 
-PUT /elliRPC/_file/{name}.{extension}
+PUT /elliRPC/@files/{fileName}
 
 Content-Type-Header (Request)
 
 - (application|image|text|video)/type (File Upload)
-
 
 ---
 <small>Ellinaut is powered by [NXI GmbH & Co. KG](https://nxiglobal.com)
