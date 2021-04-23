@@ -467,10 +467,10 @@ The packages' endpoint MUST respond with all available packages and their proced
 
 This endpoint MAY be used for automatically creation of api clients.
 
-The url path for this endpoint MUST be `/elliRPC/_packages.{contentType}`.
+The url path for this endpoint MUST be `/elliRPC/@definitions/packages.{contentType}`.
 
-Possible values for `{contentType}` MUST be `html` and `json`. Implementations of this specification MAY offer more
-content types for this endpoint.
+Possible value for `{contentType}` MUST be `json`. Implementations of this specification MAY offer more content types
+for this endpoint.
 
 This endpoint MUST respond with HTTP status `406 Not Acceptable` if an `Accept` header is given and does not match
 the `Content-Type` given via uri path.
@@ -482,7 +482,7 @@ specification. Unknown headers MUST be ignored by servers.
 
 ### Request (JSON)
 
-`GET /elliRPC/_packages.json`
+`GET /elliRPC/@definitions/packages.json`
 
 ### Response (JSON)
 
@@ -505,11 +505,11 @@ headers MUST be ignored by clients.
 
 This endpoint MAY be used for automatically creation of api clients.
 
-The url path for this endpoint MUST be `/elliRPC/_schema/{schemaName}.{contentType}`, where `{schemaName}` is the
-case-sensitive name of the requested schema.
+The url path for this endpoint MUST be `/elliRPC/@definitions/schemas/{schemaName}.{contentType}`, where `{schemaName}`
+is the case-sensitive name of the requested schema.
 
-Possible values for `{contentType}` MUST be `html` and `json`. Implementations of this specification MAY offer more
-content types for this endpoint.
+Possible value for `{contentType}` MUST be `json`. Implementations of this specification MAY offer more content types
+for this endpoint.
 
 This endpoint MUST respond with HTTP status `406 Not Acceptable` if an `Accept` header is given and does not match
 the `Content-Type` given via uri path.
@@ -521,7 +521,7 @@ specification. Unknown headers MUST be ignored by servers.
 
 ### Request
 
-`GET /elliRPC/_schema/{schemaName}.json`
+`GET /elliRPC/@definitions/schemas/{schemaName}.json`
 
 ### Response
 
@@ -534,17 +534,17 @@ The response MUST be formatted with the requested `contentType` and MUST contain
 The response MAY contain additional headers for example for caching, which is not part of this specification. Unknown
 headers MUST be ignored by clients.
 
-## Endpoint: Documentation
+## Endpoint: Application
 
 The documentation endpoint MUST respond with all available packages and their procedures and with all schemas defined
 within an application.
 
 This endpoint SHOULD be used as leading documentation and MAY be used for automatically creation of api clients.
 
-The url path for this endpoint MUST be `/elliRPC/_documentation.{contentType}`.
+The url path for this endpoint MUST be `/elliRPC/@definitions/application.{contentType}`.
 
-Possible values for `{contentType}` MUST be `html` and `json`. Implementations of this specification MAY offer more
-content types for this endpoint.
+Possible value for `{contentType}` MUST be `json`. Implementations of this specification MAY offer more content types
+for this endpoint.
 
 This endpoint MUST respond with HTTP status `406 Not Acceptable` if an `Accept` header is given and does not match
 the `Content-Type` given via uri path.
@@ -553,7 +553,7 @@ This endpoint MUST be accessible only via http method `GET`.
 
 ### Request
 
-`GET /elliRPC/_documentation.json`
+`GET /elliRPC/@definitions/application.json`
 
 ### Response
 
@@ -584,7 +584,7 @@ The `execute procedure` endpoint MUST respond as defined in the procedure defini
 requested format (`contentType`) if that `contentType` is defined as available in definition. Otherwise, it MUST respond
 with http status `415 Unsupported Media Type`.
 
-The url path for this endpoint MUST be `/elliRPC/{packageName}/{procedureName}.{contentType}`.
+The url path for this endpoint MUST be `/elliRPC/@procedures/{packageName}/{procedureName}.{contentType}`.
 
 Possible values for `{contentType}` MUST be `html` and `json`. Implementations of this specification MAY offer more
 content types for this endpoint.
@@ -618,21 +618,21 @@ specification. Unknown headers MUST be ignored by servers.
 
 ### Request
 
-`{METHOD} /elliRPC/{packageName}/{procedureName}.{contentType}`
+`{METHOD} /elliRPC/@procedures/{packageName}/{procedureName}.{contentType}`
 
 example with pagination:
-`GET /elliRPC/@app/test.json?pagination[offset]=0&pagination[limit]=10`
+`GET /elliRPC/@procedures/@app/test.json?pagination[offset]=0&pagination[limit]=10`
 
 example with sorting:
-`GET /elliRPC/@app/test.json?sort=titleAsc`
+`GET /elliRPC/@procedures/@app/test.json?sort=titleAsc`
 
 example with request data within url:
-`GET /elliRPC/@app/test.json?data[test]=test`
+`GET /elliRPC/@procedures/@app/test.json?data[test]=test`
 
 example with request data as json:
 
 ```
-POST /elliRPC/@app/test.json
+POST /elliRPC/@procedures/@app/test.json
 Content-Type: application/json
 
 {
@@ -654,25 +654,26 @@ The response MUST be formatted with the requested `contentType` and MUST contain
 The response MAY contain additional headers for example for caching, which is not part of this specification. Unknown
 headers MUST be ignored by clients.
 
-## Endpoint: Execute Procedures
+## Endpoint: Execute Procedures (Bulk)
+
+TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
 
 ### Request
 
 ```
-POST /elliRPC/_bulk
+POST /elliRPC/@procedures/executeBulk.json
 Content-Type: application/json
 
 {
-    "transactions": {
-        {transactionId}: [
-            {
-                "procedureId": {procedureId},
-                "package": {packageName},
-                "procedure": {procedureName},
-                "request": {procedureRequest}
-            }
-        ]
-    }
+    "procedures": [
+        {
+            "package": {packageName},
+            "procedure": {procedureName},
+            "pagination": {procedureData},
+            "sorting": {procedureData},
+            "data": {procedureData}
+        }
+    ]
 }
 ```
 
@@ -682,17 +683,54 @@ Content-Type: application/json
 Content-Type: application/json
 
 {
-    "transactions": {
-        {transactionId}: [
-            {
-                "procedureId": {procedureId},
-                "package": {packageName},
-                "procedure": {procedureName},
-                "status": {statusName},
-                "response": {procedureResponse}
-            }
-        ]
-    }
+    "procedures": [
+        {
+            "package": {packageName},
+            "procedure": {procedureName},
+            "successful": {true|false},
+            "result": {procedureResponse}
+        }
+    ]
+}
+```
+
+## Endpoint: Execute Transactions
+
+TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
+
+### Request
+
+```
+POST /elliRPC/@transactions/execute.json
+Content-Type: application/json
+
+{
+    "procedures": [
+        {
+            "package": {packageName},
+            "procedure": {procedureName},
+            "pagination": {procedureData},
+            "sorting": {procedureData},
+            "data": {procedureData}
+        }
+    ]
+}
+```
+
+### Response
+
+```
+Content-Type: application/json
+
+{
+    "procedures": [
+        {
+            "package": {packageName},
+            "procedure": {procedureName},
+            "successful": {true|false},
+            "result": {procedureResponse}
+        }
+    ]
 }
 ```
 
@@ -725,6 +763,17 @@ If a file could not be found on the server, the server MUST respond with http st
 @todo
 
 PUT /elliRPC/@files/{fileName}
+POST /elliRPC/@files/{fileName}
+
+Content-Type-Header (Request)
+
+- (application|image|text|video)/type (File Upload)
+
+## Endpoint: Delete File
+
+@todo
+
+DELETE /elliRPC/@files/{fileName}
 
 Content-Type-Header (Request)
 
