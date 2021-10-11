@@ -1,5 +1,6 @@
 Specification: elliRPC
 ======================
+
 <small>provided by [Ellinaut](https://github.com/Ellinaut) </small>
 
 ---
@@ -98,12 +99,13 @@ description MAY contain more detailed specifications for a property.
 
 The `PackageDefinition` is used to describe a package within an application.
 
-| Property    | Type                              | Description                                                                                            |
-| ----------- | --------------------------------- | ------------------------------------------------------------------------------------------------------ |
-| name        | string                            | The name of the package. This name MUST be unique within an application context.                       |
-| description | ?string                           | The human readable description of the package for documentation purposes, COULD be parsed as markdown. |
-| procedures  | ProcedureDefinition[]             | The list of procedures provided by this package.                                                       |
-| schemas     | SchemaDefinition[]                | The list of schemas provided by this package.                                                          |
+
+| Property    | Type                  | Description                                                                                            |
+| ------------- | ----------------------- | -------------------------------------------------------------------------------------------------------- |
+| name        | string                | The name of the package. This name MUST be unique within an application context.                       |
+| description | ?string               | The human readable description of the package for documentation purposes, COULD be parsed as markdown. |
+| procedures  | ProcedureDefinition[] | The list of procedures provided by this package.                                                       |
+| schemas     | SchemaDefinition[]    | The list of schemas provided by this package.                                                          |
 
 A full `PackageDefinition` as JSON looks like:
 
@@ -174,8 +176,9 @@ A full `PackageDefinition` as JSON looks like:
 
 The `ProcedureDefinition` is used to describe a single procedure within a package.
 
+
 | Property    | Type                | Description                                                                               |
-| ----------- | ------------------- | ----------------------------------------------------------------------------------------- |
+| ------------- | --------------------- | ------------------------------------------------------------------------------------------- |
 | name        | string              | The name of the procedure. This name MUST be unique within a package context.             |
 | description | string or null      | The description of the procedure for documentation purposes, COULD be parsed as markdown. |
 | request     | TransportDefinition | The definition of the procedure request.                                                  |
@@ -186,10 +189,11 @@ The `ProcedureDefinition` is used to describe a single procedure within a packag
 The `TransportDefinition` is used to describe how data MUST be transferred between client and server in the request or
 response for a procedure call.
 
-| Property    | Type                       | Description                                                                           |
-| ----------- | -------------------------- | ------------------------------------------------------------------------------------- |
-| data        | ?DataDefinition            | The structure how data MUST be sent. MUST be `null` if no data can be sent.           |
-| meta        | ?SchemaReferenceDefinition | The structure how meta data MUST be sent. MUST be `null` if no meta data can be sent. |
+
+| Property | Type                       | Description                                                                          |
+| ---------- | ---------------------------- | -------------------------------------------------------------------------------------- |
+| data     | ?DataDefinition            | The structure how data MUST be sent. MUST be`null` if no data can be sent.           |
+| meta     | ?SchemaReferenceDefinition | The structure how meta data MUST be sent. MUST be`null` if no meta data can be sent. |
 
 **Note:** `data` MUST contain all required data which are essential for a procedure call or which have an impact to the
 procedure logic. `meta` MUST contain only data, which COULD help to process a procedure or indicates client/server
@@ -200,8 +204,9 @@ parameters. `meta` or partials of it MAY be ignored by clients or servers while 
 
 The `DataDefinition` is used to describe how the `data` property MUST be structured in requests or responses.
 
+
 | Property  | Type                       | Description                                                                     |
-| --------- | -------------------------- | ------------------------------------------------------------------------------- |
+| ----------- | ---------------------------- | --------------------------------------------------------------------------------- |
 | context   | ?string                    | The context if the schema isn't defined in the same package.                    |
 | schema    | string                     | The case sensitive name of (internal or external) schema, which should be used. |
 | wrappedBy | ?SchemaReferenceDefinition | The schema reference to the schema, which is used as wrapper.                   |
@@ -216,8 +221,9 @@ used.
 
 The `SchemaReferenceDefinition` is used to reference a schema which should be used to structure data.
 
+
 | Property | Type    | Description                                                                         |
-| -------- | ------- | ----------------------------------------------------------------------------------- |
+| ---------- | --------- | ------------------------------------------------------------------------------------- |
 | context  | ?string | The context if the schema isn't defined in the same package.                        |
 | schema   | string  | The case sensitive name of (internal or external) schema, which should be extended. |
 
@@ -231,8 +237,9 @@ used.
 
 The `SchemaDefinition` is used to describe how data MUST be structured into one or more properties.
 
+
 | Property    | Type                       | Description                                                                            |
-| ----------- | -------------------------- | -------------------------------------------------------------------------------------- |
+| ------------- | ---------------------------- | ---------------------------------------------------------------------------------------- |
 | name        | string                     | The name of the schema, which MUST be unique within a package.                         |
 | abstract    | boolean                    | Indicates that this schema can only be used with other schemas.                        |
 | extends     | ?SchemaReferenceDefinition | The schema, which is extended with this schema.                                        |
@@ -243,8 +250,9 @@ The `SchemaDefinition` is used to describe how data MUST be structured into one 
 
 The `PropertyDefinition` is used to describe how a single property MUST be used within a schema.
 
+
 | Property    | Type                   | Description                                                                                      |
-| ----------- | ---------------------- | ------------------------------------------------------------------------------------------------ |
+| ------------- | ------------------------ | -------------------------------------------------------------------------------------------------- |
 | name        | string                 | The property name used as key in request or response body, which MUST be unique within a schema. |
 | description | ?string                | The property description for documentation, COULD be parsed as markdown.                         |
 | type        | PropertyTypeDefinition | The property type definition.                                                                    |
@@ -253,11 +261,12 @@ The `PropertyDefinition` is used to describe how a single property MUST be used 
 
 The `PropertyTypeDefinition` is used to describe how a property look like and how it MUST be handled.
 
-| Property    | Type     | Description                                                                              |
-| ----------- | -------- | ---------------------------------------------------------------------------------------- |
-| context     | ?string  | The context of the schema which is used as type or `null` for build-in types.            |
-| type        | string   | The case sensitive name of the build-in type, or the used (internal or external) schema. |
-| options     | string[] | A list of property options.                                                              |
+
+| Property | Type     | Description                                                                              |
+| ---------- | ---------- | ------------------------------------------------------------------------------------------ |
+| context  | ?string  | The context of the schema which is used as type or`null` for build-in types.             |
+| type     | string   | The case sensitive name of the build-in type, or the used (internal or external) schema. |
+| options  | string[] | A list of property options.                                                              |
 
 **Note:** The context MUST be `null` if the type is a schema in the same package or a build-in type. It MUST
 be `elliRPC` if the type is a pre-defined schema from this specification. It MUST be the package name if the type is a
@@ -269,8 +278,9 @@ type is an external schema (e.g. from schema.org).
 
 These are the build-in property types of *elliRPC*. Additional types MAY be added by extensions of this specification.
 
+
 | Type     | Description                                                                                                           |
-| -------- | --------------------------------------------------------------------------------------------------------------------- |
+| ---------- | ----------------------------------------------------------------------------------------------------------------------- |
 | id       | Indicates that the property is used as id of type integer.                                                            |
 | idString | Indicates that the property is used as id of type string.                                                             |
 | uuid     | Indicates that the property is used as id and contains an uuid as defined in RFC 4122.                                |
@@ -280,8 +290,8 @@ These are the build-in property types of *elliRPC*. Additional types MAY be adde
 | boolean  | -                                                                                                                     |
 | email    | A string formatted as valid email address as defined by RFC 5322 and RFC 6530.                                        |
 | date     | A date string formatted as ISO 8601 date (YYYY-MM-DD).                                                                |
-| time     | A time string formatted as ISO 8601 time with timezone (hh:mm:ss±hh:mm).                                              |
-| datetime | A datetime string formatted as ISO 8601 combined date and time with timezone (YYYY-MM-DD\Thh:mm:ss±hh:mm).            |
+| time     | A time string formatted as ISO 8601 time with timezone (hh:mm:ss±hh:mm).                                             |
+| datetime | A datetime string formatted as ISO 8601 combined date and time with timezone (YYYY-MM-DD\Thh:mm:ss±hh:mm).           |
 | duration | A duration string formatted as ISO 8601 duration (P<date>T<time>).                                                    |
 | geoJson  | A json object formatted and to be interpreted as (GeoJson)[https://geojson.org/], defined in RFC 7946.                |
 | wrapper  | A placeholder used in wrapper schemas where the wrapped content later should go. The schema it self MUST be abstract. |
@@ -311,19 +321,20 @@ A client MUST ignore options it doesn't know but MUST support at least the offic
 
 Official available *elliRPC* options are:
 
-| Option             | Description                                                                                                    |
-| ------------------ | -------------------------------------------------------------------------------------------------------------- |
-| @nullable          | The property value is allowed to be `null`.                                                                    |
-| @notEmpty          | The property value is not allowed to be empty. Empty values are lists without values, `null` or empty strings. |
-| @positive          | The property value MUST be a positive number.                                                                  |
-| @negative          | The property value MUST be a negative number.                                                                  |
-| @map               | The property does contain a key-value-map (object in json), where the key is a unique name for a value.        |
-| @list              | The property does contain a ordered list (array in json) of values.                                            |
-| @set               | The property does contain a unordered list (array in json) of values.                                          |
-| @language          | The property does contain a key-value map, where the key MUST be a language designator (ISO 639-1).            |
-| @extendedLanguage  | The property does contain a key-value map, where the key MUST be a language designator (ISO 639-2/T).          |
-| @localized         | The property does contain a key-value map, where the key MUST be a region designator (ISO 3166-1).             |
-| @scripted          | The property does contain a key-value map, where the key MUST be a script designator (ISO 15924).              |
+
+| Option            | Description                                                                                                   |
+| ------------------- | --------------------------------------------------------------------------------------------------------------- |
+| @nullable         | The property value is allowed to be`null`.                                                                    |
+| @notEmpty         | The property value is not allowed to be empty. Empty values are lists without values,`null` or empty strings. |
+| @positive         | The property value MUST be a positive number.                                                                 |
+| @negative         | The property value MUST be a negative number.                                                                 |
+| @map              | The property does contain a key-value-map (object in json), where the key is a unique name for a value.       |
+| @list             | The property does contain a ordered list (array in json) of values.                                           |
+| @set              | The property does contain a unordered list (array in json) of values.                                         |
+| @language         | The property does contain a key-value map, where the key MUST be a language designator (ISO 639-1).           |
+| @extendedLanguage | The property does contain a key-value map, where the key MUST be a language designator (ISO 639-2/T).         |
+| @localized        | The property does contain a key-value map, where the key MUST be a region designator (ISO 3166-1).            |
+| @scripted         | The property does contain a key-value map, where the key MUST be a script designator (ISO 15924).             |
 
 ##### Option Chaining
 
@@ -352,11 +363,12 @@ See endpoint definition to see how errors are responded.
 
 Error objects MUST be structured like this:
 
+
 | Property | Type                | Description                                                                                                                                                                            |
-| -------- | ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ---------- | --------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | message  | string{`@language`} | The message contains an human-readable description which MAY is displayed to end-users. This property MUST contain an object with language designator as key and translation as value. |
 | code     | ?string             | The error code is an optional string value which contains an application specific error code for each kind of error.                                                                   |
-| source   | ?string             | A JSON Pointer [RFC6901](https://datatracker.ietf.org/doc/html/rfc6901) to the associated property in the request document which lead to the occurred error.                           |
+| source   | ?string             | A JSON Pointer[RFC6901](https://datatracker.ietf.org/doc/html/rfc6901) to the associated property in the request document which lead to the occurred error.                            |
 
 Here is how this would look like in JSON:
 
@@ -396,8 +408,9 @@ others. If a prefix is used, the same prefix MUST be used for all endpoints.
 The following endpoints are defined by this specification, other endpoints MAY be defined by extensions of this
 specification.
 
+
 | Endpoint               | HTTP method | URL path                   | Description                                                                               |
-| ---------------------- | ----------- | -------------------------- | ----------------------------------------------------------------------------------------- |
+| ------------------------ | ------------- | ---------------------------- | ------------------------------------------------------------------------------------------- |
 | Get Documentation      | GET         | /definitions               | This endpoint provides the full api definition.                                           |
 | Get Package Definition | GET         | /definitions/{packageName} | This endpoint provides the definition for a single package.                               |
 | Execute Procedure      | POST        | /procedures/execute        | This endpoint is used to execute a single procedure.                                      |
@@ -413,7 +426,7 @@ This endpoint MUST respond with the full api definition and SHOULD be used as th
 for automatically creation of api clients or the request/response validation.
 
 The url path for this endpoint (after a possible prefix) MUST be `/definitions`. The endpoint MUST be accessible only
-via http method `GET`.
+via HTTP method `GET`.
 
 #### Request
 
@@ -430,8 +443,9 @@ via http method `GET`.
 }
 ```
 
+
 | Property    | Type                | Description                                                                                    |
-| ----------- | ------------------- | ---------------------------------------------------------------------------------------------- |
+| ------------- | --------------------- | ------------------------------------------------------------------------------------------------ |
 | application | string              | The name of the application.                                                                   |
 | description | string or null      | The description of the whole application. It COULD be parsed as markdown.                      |
 | extensions  | string[]            | A list of used specification extensions. Values MUST be URIs to their official specifications. |
@@ -443,7 +457,7 @@ This endpoint MUST respond with the definition for a single package. The URI for
 context in schema references.
 
 The url path for this endpoint (after a possible prefix) MUST be `/definitions/{packageName}`. The endpoint MUST be
-accessible only via http method `GET`.
+accessible only via HTTP method `GET`.
 
 TODO: Request / Response
 
@@ -452,7 +466,7 @@ TODO: Request / Response
 The procedure call endpoint SHOULD be used to execute a single procedure.
 
 The url path for this endpoint (after a possible prefix) MUST be `/procedures/execute`. This endpoint MUST only be
-accessible via http method `POST`.
+accessible via HTTP method `POST`.
 
 #### Request
 
@@ -484,16 +498,17 @@ Content-Type: application/json
 
 This endpoint MUST respond with a valid json document and the content type header `application/json` MUST be used.
 
-The endpoint MUST respond with a valid http status `200 OK` if called with a valid data structure. If the request data
+The endpoint MUST respond with a valid HTTP status `200 OK` if called with a valid data structure. If the request data
 does not match the defined schema, does not contain valid json or if package or procedure does not exist, the server
-MUST respond with http status `400 Bad Request` and a single error object in the response body. If a content type header
-is requested and the requested content type header does not match `application/json`, the server MUST respond with http
+MUST respond with HTTP status `400 Bad Request` and a single error object in the response body. If a content type header
+is requested and the requested content type header does not match `application/json`, the server MUST respond with HTTP
 status `415 Unsupported Media Type` and a single error object in the response body.
 
 The response body MUST be a valid json object structured like:
 
+
 | Property | Type    | Description                                                                                           |
-| -------- | ------- | ----------------------------------------------------------------------------------------------------- |
+| ---------- | --------- | ------------------------------------------------------------------------------------------------------- |
 | success  | boolean | Indicator if procedure execution was successful or not.                                               |
 | data     | ?object | The procedure result data for the client, structured as defined by the procedure response definition. |
 | meta     | ?object | Additional meta data for the client, structured as defined by the procedure response definition.      |
@@ -520,13 +535,13 @@ headers MUST be ignored by clients.
 ### Endpoint: Execute Bulk (TODO Refactoring)
 
 The `bulk` endpoint SHOULD be used if several procedures are to be executed directly one after the other, but without
-dependencies among each other. Using the bulk request can improve performance by reducing unnecessary http requests.
+dependencies among each other. Using the bulk request can improve performance by reducing unnecessary HTTP requests.
 
 The url path for this endpoint MUST be `/elliRPC/bulk`.
 
 #### Request
 
-This endpoint MUST be called with http method `POST`. The request body MUST be formatted as JSON, where all procedure
+This endpoint MUST be called with HTTP method `POST`. The request body MUST be formatted as JSON, where all procedure
 execution requests are listed under the key `procedures`.
 
 Since there must be no dependencies between the procedures in this request, the order of execution on the server is not
@@ -558,10 +573,10 @@ Content-Type: application/json
 The response MUST NOT be empty and MUST contain valid `JSON`. It MUST contain a procedure result for each requested
 procedure execution.
 
-The endpoint MUST respond with a valid http status `200 OK` if called with a valid data structure. If the request data
+The endpoint MUST respond with a valid HTTP status `200 OK` if called with a valid data structure. If the request data
 does not match the defined schema, does not contain valid json or if package or procedure does not exist, the server
-MUST respond with http status `400 Bad Request` and a single error object in the response body. If a content type header
-is requested and the requested content type header does not match `application/json`, the server MUST respond with http
+MUST respond with HTTP status `400 Bad Request` and a single error object in the response body. If a content type header
+is requested and the requested content type header does not match `application/json`, the server MUST respond with HTTP
 status `415 Unsupported Media Type` and a single error object in the response body.
 
 Procedure results MUST appear in the same order as requested and are summarized under key `procedures` in the response
@@ -570,9 +585,9 @@ indicator, the procedure `data` and `meta`. `data` MUST be a json object formatt
 definition. `data` MAY be `null`, if the procedure response is defined as nullable. If `successful` is `false`, `data`
 MUST contain the occurred error, formatted as defined by the global error object definition. `data` MAY be `null`, if no
 error object is defined. `meta` MUST be a set of key-value-pairs MAY be containing additional information which would
-otherwise sent via http headers.
+otherwise sent via HTTP headers.
 
-The server SHOULD always respond with http status `200 OK`. If the client receive any other http status from the server,
+The server SHOULD always respond with HTTP status `200 OK`. If the client receive any other HTTP status from the server,
 it MUST assume, that all procedure executions failed in case of a server problem.
 
 ```
@@ -602,7 +617,7 @@ The url path for this endpoint MUST be `/procedures/transaction`.
 
 #### Request
 
-The `transaction` endpoint MUST be called with http method `POST`. The request body MUST be formatted as JSON, where all
+The `transaction` endpoint MUST be called with HTTP method `POST`. The request body MUST be formatted as JSON, where all
 procedure execution requests are listed under the key `procedures`.
 
 Since there is a dependencies between the procedures in this request, the order of execution on the server is relevant
@@ -636,10 +651,10 @@ Content-Type: application/json
 The response MUST NOT be empty and MUST contain valid `JSON`. It MUST contain a procedure result for each executed
 procedure and MUST NOT contain results for non executed procedures.
 
-The endpoint MUST respond with a valid http status `200 OK` if called with a valid data structure. If the request data
+The endpoint MUST respond with a valid HTTP status `200 OK` if called with a valid data structure. If the request data
 does not match the defined schema, does not contain valid json or if package or procedure does not exist, the server
-MUST respond with http status `400 Bad Request` and a single error object in the response body. If a content type header
-is requested and the requested content type header does not match `application/json`, the server MUST respond with http
+MUST respond with HTTP status `400 Bad Request` and a single error object in the response body. If a content type header
+is requested and the requested content type header does not match `application/json`, the server MUST respond with HTTP
 status `415 Unsupported Media Type` and a single error object in the response body.
 
 Procedure results MUST appear in the same order as requested and are summarized under key `procedures` in the response
@@ -648,10 +663,10 @@ indicator, the procedure `data` and `meta`. `data` MUST be a json object formatt
 definition. `data` MAY be `null`, if the procedure response is defined as nullable. If `successful` is `false`, `data`
 MUST contain the occurred error, formatted as defined by the global error object definition. `data` MAY be `null`, if no
 error object is defined. `meta` MUST be a set of key-value-pairs MAY be containing additional information which would
-otherwise sent via http headers.
+otherwise sent via HTTP headers.
 
-The server MUST respond with http status `200 OK` if all procedures have been executed successfully. In case of an error
-the server MUST respond with a suitable http status for the occurred error. If a client receives a http status other
+The server MUST respond with HTTP status `200 OK` if all procedures have been executed successfully. In case of an error
+the server MUST respond with a suitable HTTP status for the occurred error. If a client receives a HTTP status other
 than `200 OK`, it MUST assume that all procedures have failed or are not executed. It SHOULD parse the response to find
 the failed procedure (`"success": false`) and the concrete error if provided.
 
@@ -676,7 +691,7 @@ Content-Type: application/json
 
 The `get file` endpoint is used to retrieve a file from the server.
 
-The `get file` endpoint MUST be called via http method `GET`.
+The `get file` endpoint MUST be called via HTTP method `GET`.
 
 The url path for this endpoint MUST be `/elliRPC/files/{fileName}`.
 
@@ -688,23 +703,23 @@ least the file name MUST be separated by slashes (`/`). For example: `/elliRPC/f
 The request MAY contain additional headers for example for caching or authorization, which are not parts of this
 specification. Unknown headers MUST be ignored by servers.
 
-This endpoint MAY respond with the http header `Content-Disposition` to give a filename which MAY be different from the
+This endpoint MAY respond with the HTTP header `Content-Disposition` to give a filename which MAY be different from the
 url filename.
 
 The response MUST contain a valid `Content-Type` header.
 
-The response MAY contain additional http headers for example for caching, which is not part of this specification.
+The response MAY contain additional HTTP headers for example for caching, which is not part of this specification.
 Unknown headers MUST be ignored by clients.
 
 The response body MUST contain only the file content.
 
-If a file could not be found on the server, the server MUST respond with http status `404 Not Found`.
+If a file could not be found on the server, the server MUST respond with HTTP status `404 Not Found`.
 
 ### Endpoint: Upload File
 
 The `upload file` endpoint is used to store a file on the server.
 
-The `upload file` endpoint MUST be called via http method `POST` or `PUT`. If called via `POST` a file will be created
+The `upload file` endpoint MUST be called via HTTP method `POST` or `PUT`. If called via `POST` a file will be created
 on the server if it does not already exist, otherwise an error will be happened. If called via `PUT` a file will be
 created on the server if it does not already exist, otherwise the existing file will be replaced with the new one.
 
@@ -722,19 +737,19 @@ The request SHOULD contain a valid `Content-Type` header.
 
 The request body MUST only contain the file content.
 
-The server MUST respond with http status `201 Created` if the file upload was successfully. Each other http status MUST
+The server MUST respond with HTTP status `201 Created` if the file upload was successfully. Each other HTTP status MUST
 be assumed as upload failed.
 
-This server MAY respond with the http header `Content-Disposition` to give a new location where the file was created.
+This server MAY respond with the HTTP header `Content-Disposition` to give a new location where the file was created.
 This MAY differ from the upload destination.
 
-The response MAY contain additional http headers. Unknown headers MUST be ignored by clients.
+The response MAY contain additional HTTP headers. Unknown headers MUST be ignored by clients.
 
 ### Endpoint: Delete File
 
 The `delete file` endpoint is used to delete a file from the server.
 
-The `delete file` endpoint MUST be called via http method `DELETE`.
+The `delete file` endpoint MUST be called via HTTP method `DELETE`.
 
 The url path for this endpoint MUST be `/elliRPC/files/{fileName}`.
 
@@ -746,7 +761,7 @@ least the file name MUST be separated by slashes (`/`). For example: `/elliRPC/f
 The request MAY contain additional headers for example for authorization, which is not part of this specification.
 Unknown headers MUST be ignored by servers.
 
-The server MUST respond with http status `204 No Content` in case of success. Otherwise, it MUST respond with a suitable
+The server MUST respond with HTTP status `204 No Content` in case of success. Otherwise, it MUST respond with a suitable
 http error.
 
 ## Extending this specification (TODO Refactoring)
@@ -754,5 +769,6 @@ http error.
 TODO
 
 ---
+
 <small>Ellinaut is powered by [NXI GmbH & Co. KG](https://nxiglobal.com)
 and [BVH Bootsvermietung Hamburg GmbH](https://www.bootszentrum-hamburg.de).</small>
