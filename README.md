@@ -104,8 +104,8 @@ The `PackageDefinition` is used to describe a package within an application.
 | ------------- | ----------------------- | -------------------------------------------------------------------------------------------------------- |
 | name        | string                | The name of the package. This name MUST be unique within an application context.                       |
 | description | ?string               | The human readable description of the package for documentation purposes, COULD be parsed as markdown. |
-| procedures  | ProcedureDefinition[] | The list of procedures provided by this package.                                                       |
-| schemas     | SchemaDefinition[]    | The list of schemas provided by this package.                                                          |
+| procedures  | [ProcedureDefinition](#proceduregefinition)[] | The list of procedures provided by this package.                                                       |
+| schemas     | [SchemaDefinition](#schemadefinition)[]    | The list of schemas provided by this package.                                                          |
 
 A full `PackageDefinition` as JSON looks like:
 
@@ -181,8 +181,8 @@ The `ProcedureDefinition` is used to describe a single procedure within a packag
 | ------------- | --------------------- | ------------------------------------------------------------------------------------------- |
 | name        | string              | The name of the procedure. This name MUST be unique within a package context.             |
 | description | string or null      | The description of the procedure for documentation purposes, COULD be parsed as markdown. |
-| request     | TransportDefinition | The definition of the procedure request.                                                  |
-| response    | TransportDefinition | The definition of the procedure response.                                                 |
+| request     | [TransportDefinition](#transportdefinition) | The definition of the procedure request.                                                  |
+| response    | [TransportDefinition](#transportdefinition) | The definition of the procedure response.                                                 |
 
 ### TransportDefinition
 
@@ -192,8 +192,8 @@ response for a procedure call.
 
 | Property | Type                       | Description                                                                          |
 | ---------- | ---------------------------- | -------------------------------------------------------------------------------------- |
-| data     | ?DataDefinition            | The structure how data MUST be sent. MUST be`null` if no data can be sent.           |
-| meta     | ?SchemaReferenceDefinition | The structure how meta data MUST be sent. MUST be`null` if no meta data can be sent. |
+| data     | ?[DataDefinition](#datadefinition)            | The structure how data MUST be sent. MUST be`null` if no data can be sent.           |
+| meta     | ?[SchemaReferenceDefinition](#schemareferencedefinition) | The structure how meta data MUST be sent. MUST be`null` if no meta data can be sent. |
 
 **Note:** `data` MUST contain all required data which are essential for a procedure call or which have an impact to the
 procedure logic. `meta` MUST contain only data, which COULD help to process a procedure or indicates client/server
@@ -209,7 +209,7 @@ The `DataDefinition` is used to describe how the `data` property MUST be structu
 | ----------- | ---------------------------- | --------------------------------------------------------------------------------- |
 | context   | ?string                    | The context if the schema isn't defined in the same package.                    |
 | schema    | string                     | The case sensitive name of (internal or external) schema, which should be used. |
-| wrappedBy | ?SchemaReferenceDefinition | The schema reference to the schema, which is used as wrapper.                   |
+| wrappedBy | ?[SchemaReferenceDefinition](#schemareferencedefinition) | The schema reference to the schema, which is used as wrapper.                   |
 
 **Note:** The context MUST be `null` for a schema in the same package. It MUST be `elliRPC` for a pre-defined schema
 from this specification. It MUST be the package name if the schema is defined in another package of the same
@@ -242,9 +242,9 @@ The `SchemaDefinition` is used to describe how data MUST be structured into one 
 | ------------- | ---------------------------- | ---------------------------------------------------------------------------------------- |
 | name        | string                     | The name of the schema, which MUST be unique within a package.                         |
 | abstract    | boolean                    | Indicates that this schema can only be used with other schemas.                        |
-| extends     | ?SchemaReferenceDefinition | The schema, which is extended with this schema.                                        |
+| extends     | ?[SchemaReferenceDefinition](#schemareferencedefinition) | The schema, which is extended with this schema.                                        |
 | description | ?string                    | The description of the schema for documentation purposes, COULD be parsed as markdown. |
-| properties  | PropertyDefinition[]       | A list of properties for the schema.                                                   |
+| properties  | [PropertyDefinition](#propertydefinition)[]       | A list of properties for the schema.                                                   |
 
 ### PropertyDefinition
 
@@ -255,7 +255,7 @@ The `PropertyDefinition` is used to describe how a single property MUST be used 
 | ------------- | ------------------------ | -------------------------------------------------------------------------------------------------- |
 | name        | string                 | The property name used as key in request or response body, which MUST be unique within a schema. |
 | description | ?string                | The property description for documentation, COULD be parsed as markdown.                         |
-| type        | PropertyTypeDefinition | The property type definition.                                                                    |
+| type        | [PropertyTypeDefinition](#propertytypedefinition) | The property type definition.                                                                    |
 
 ### PropertyTypeDefinition
 
@@ -411,14 +411,14 @@ specification.
 
 | Endpoint               | HTTP method | URL path                   | Description                                                                               |
 | ------------------------ | ------------- | ---------------------------- | ------------------------------------------------------------------------------------------- |
-| Get Documentation      | GET         | /definitions               | This endpoint provides the full api definition.                                           |
-| Get Package Definition | GET         | /definitions/{packageName} | This endpoint provides the definition for a single package.                               |
-| Execute Procedure      | POST        | /procedures/execute        | This endpoint is used to execute a single procedure.                                      |
-| Execute Bulk           | POST        | /procedures/bulk           | This endpoint is used to execute multiple procedures independently of each other.         |
-| Execute Transaction    | POST        | /procedures/transaction    | This endpoint is used to execute multiple procedures dependently in a single transaction. |
-| Get File               | GET         | /files/{fileName}          | This endpoint is used to retrieve a file from the server.                                 |
-| Upload File            | POST or PUT | /files/{fileName}          | This endpoint is used to upload a file to the server.                                     |
-| Delete File            | DELETE      | /files/{fileName}          | This endpoint is used to delete a file from the server.                                   |
+| [Get Documentation](#endpoint-get-documentation)                              | GET         | /definitions               | This endpoint provides the full api definition.                                           |
+| [Get Package Definition](#endpoint-get-package-definition-todo-refactoring)   | GET         | /definitions/{packageName} | This endpoint provides the definition for a single package.                               |
+| [Execute Procedure](#endpoint-execute-procedure)                              | POST        | /procedures/execute        | This endpoint is used to execute a single procedure.                                      |
+| [Execute Bulk](#endpoint-execute-bulk-todo-refactoring)                       | POST        | /procedures/bulk           | This endpoint is used to execute multiple procedures independently of each other.         |
+| [Execute Transaction](#endpoint-execute-transaction--todo-refactoring)        | POST        | /procedures/transaction    | This endpoint is used to execute multiple procedures dependently in a single transaction. |
+| [Get File](#endpoint-get-file)                                                | GET         | /files/{fileName}          | This endpoint is used to retrieve a file from the server.                                 |
+| [Upload File](#endpoint-upload-file)                                          | POST or PUT | /files/{fileName}          | This endpoint is used to upload a file to the server.                                     |
+| [Delete File](#endpoint-delete-file)                                          | DELETE      | /files/{fileName}          | This endpoint is used to delete a file from the server.                                   |
 
 ### Endpoint: Get Documentation
 
@@ -449,7 +449,7 @@ via HTTP method `GET`.
 | application | string              | The name of the application.                                                                   |
 | description | string or null      | The description of the whole application. It COULD be parsed as markdown.                      |
 | extensions  | string[]            | A list of used specification extensions. Values MUST be URIs to their official specifications. |
-| packages    | PackageDefinition[] | A list of all available packages within this application.                                      |
+| packages    | [PackageDefinition](#packagedefinition)[] | A list of all available packages within this application.                                      |
 
 ### Endpoint: Get Package Definition (TODO Refactoring)
 
@@ -512,7 +512,7 @@ The response body MUST be a valid json object structured like:
 | success  | boolean | Indicator if procedure execution was successful or not.                                               |
 | data     | ?object | The procedure result data for the client, structured as defined by the procedure response definition. |
 | meta     | ?object | Additional meta data for the client, structured as defined by the procedure response definition.      |
-| errors   | Error[] | A list of error objects.                                                                              |
+| errors   | [Error](#error-handling)[] | A list of error objects.                                                                              |
 
 The response data MUST only contain the properties defined by response schema. The client MUST ignore any additional
 property. The client MAY validate all properties and MUST throw an error, if any property is missing or does not match
@@ -762,7 +762,7 @@ The request MAY contain additional headers for example for authorization, which 
 Unknown headers MUST be ignored by servers.
 
 The server MUST respond with HTTP status `204 No Content` in case of success. Otherwise, it MUST respond with a suitable
-http error.
+HTTP error.
 
 ## Extending this specification (TODO Refactoring)
 
