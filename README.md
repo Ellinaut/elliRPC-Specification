@@ -104,7 +104,7 @@ The `PackageDefinition` is used to describe a package within an application.
 | ------------- | ----------------------- | -------------------------------------------------------------------------------------------------------- |
 | name        | string                | The name of the package. This name MUST be unique within an application context.                       |
 | description | ?string               | The human readable description of the package for documentation purposes, COULD be parsed as markdown. |
-| procedures  | [ProcedureDefinition](#proceduregefinition)[] | The list of procedures provided by this package.                                                       |
+| procedures  | [ProcedureDefinition](#proceduredefinition)[] | The list of procedures provided by this package.                                                       |
 | schemas     | [SchemaDefinition](#schemadefinition)[]    | The list of schemas provided by this package.                                                          |
 
 A full `PackageDefinition` as JSON looks like:
@@ -233,7 +233,7 @@ application. It MUST be a URL to the concrete package endpoint if the schema is 
 application. It MUST be an IRI for an external `JSON LD` schema if an external schema (e.g. from schema.org) should be
 used.
 
-### Schema Definition
+### SchemaDefinition
 
 The `SchemaDefinition` is used to describe how data MUST be structured into one or more properties.
 
