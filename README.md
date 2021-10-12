@@ -99,13 +99,12 @@ description MAY contain more detailed specifications for a property.
 
 The `PackageDefinition` is used to describe a package within an application.
 
-
-| Property    | Type                  | Description                                                                                            |
-| ------------- | ----------------------- | -------------------------------------------------------------------------------------------------------- |
-| name        | string                | The name of the package. This name MUST be unique within an application context.                       |
-| description | ?string               | The human readable description of the package for documentation purposes, COULD be parsed as markdown. |
+| Property    | Type                                          | Description                                                                                            |
+| ----------- | --------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| name        | string                                        | The name of the package. This name MUST be unique within an application context.                       |
+| description | ?string                                       | The human readable description of the package for documentation purposes, COULD be parsed as markdown. |
 | procedures  | [ProcedureDefinition](#proceduredefinition)[] | The list of procedures provided by this package.                                                       |
-| schemas     | [SchemaDefinition](#schemadefinition)[]    | The list of schemas provided by this package.                                                          |
+| schemas     | [SchemaDefinition](#schemadefinition)[]       | The list of schemas provided by this package.                                                          |
 
 A full `PackageDefinition` as JSON looks like:
 
@@ -176,11 +175,10 @@ A full `PackageDefinition` as JSON looks like:
 
 The `ProcedureDefinition` is used to describe a single procedure within a package.
 
-
-| Property    | Type                | Description                                                                               |
-| ------------- | --------------------- | ------------------------------------------------------------------------------------------- |
-| name        | string              | The name of the procedure. This name MUST be unique within a package context.             |
-| description | string or null      | The description of the procedure for documentation purposes, COULD be parsed as markdown. |
+| Property    | Type                                        | Description                                                                               |
+| ----------- | ------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| name        | string                                      | The name of the procedure. This name MUST be unique within a package context.             |
+| description | string or null                              | The description of the procedure for documentation purposes, COULD be parsed as markdown. |
 | request     | [TransportDefinition](#transportdefinition) | The definition of the procedure request.                                                  |
 | response    | [TransportDefinition](#transportdefinition) | The definition of the procedure response.                                                 |
 
@@ -189,10 +187,9 @@ The `ProcedureDefinition` is used to describe a single procedure within a packag
 The `TransportDefinition` is used to describe how data MUST be transferred between client and server in the request or
 response for a procedure call.
 
-
-| Property | Type                       | Description                                                                          |
-| ---------- | ---------------------------- | -------------------------------------------------------------------------------------- |
-| data     | ?[DataDefinition](#datadefinition)            | The structure how data MUST be sent. MUST be`null` if no data can be sent.           |
+| Property | Type                                                     | Description                                                                          |
+| -------- | -------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| data     | ?[DataDefinition](#datadefinition)                       | The structure how data MUST be sent. MUST be`null` if no data can be sent.           |
 | meta     | ?[SchemaReferenceDefinition](#schemareferencedefinition) | The structure how meta data MUST be sent. MUST be`null` if no meta data can be sent. |
 
 **Note:** `data` MUST contain all required data which are essential for a procedure call or which have an impact to the
@@ -204,11 +201,10 @@ parameters. `meta` or partials of it MAY be ignored by clients or servers while 
 
 The `DataDefinition` is used to describe how the `data` property MUST be structured in requests or responses.
 
-
-| Property  | Type                       | Description                                                                     |
-| ----------- | ---------------------------- | --------------------------------------------------------------------------------- |
-| context   | ?string                    | The context if the schema isn't defined in the same package.                    |
-| schema    | string                     | The case sensitive name of (internal or external) schema, which should be used. |
+| Property  | Type                                                     | Description                                                                     |
+| --------- | -------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| context   | ?string                                                  | The context if the schema isn't defined in the same package.                    |
+| schema    | string                                                   | The case sensitive name of (internal or external) schema, which should be used. |
 | wrappedBy | ?[SchemaReferenceDefinition](#schemareferencedefinition) | The schema reference to the schema, which is used as wrapper.                   |
 
 **Note:** The context MUST be `null` for a schema in the same package. It MUST be `elliRPC` for a pre-defined schema
@@ -221,9 +217,8 @@ used.
 
 The `SchemaReferenceDefinition` is used to reference a schema which should be used to structure data.
 
-
 | Property | Type    | Description                                                                         |
-| ---------- | --------- | ------------------------------------------------------------------------------------- |
+| -------- | ------- | ----------------------------------------------------------------------------------- |
 | context  | ?string | The context if the schema isn't defined in the same package.                        |
 | schema   | string  | The case sensitive name of (internal or external) schema, which should be extended. |
 
@@ -237,33 +232,30 @@ used.
 
 The `SchemaDefinition` is used to describe how data MUST be structured into one or more properties.
 
-
-| Property    | Type                       | Description                                                                            |
-| ------------- | ---------------------------- | ---------------------------------------------------------------------------------------- |
-| name        | string                     | The name of the schema, which MUST be unique within a package.                         |
-| abstract    | boolean                    | Indicates that this schema can only be used with other schemas.                        |
+| Property    | Type                                                     | Description                                                                            |
+| ----------- | -------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| name        | string                                                   | The name of the schema, which MUST be unique within a package.                         |
+| abstract    | boolean                                                  | Indicates that this schema can only be used with other schemas.                        |
 | extends     | ?[SchemaReferenceDefinition](#schemareferencedefinition) | The schema, which is extended with this schema.                                        |
-| description | ?string                    | The description of the schema for documentation purposes, COULD be parsed as markdown. |
-| properties  | [PropertyDefinition](#propertydefinition)[]       | A list of properties for the schema.                                                   |
+| description | ?string                                                  | The description of the schema for documentation purposes, COULD be parsed as markdown. |
+| properties  | [PropertyDefinition](#propertydefinition)[]              | A list of properties for the schema.                                                   |
 
 ### PropertyDefinition
 
 The `PropertyDefinition` is used to describe how a single property MUST be used within a schema.
 
-
-| Property    | Type                   | Description                                                                                      |
-| ------------- | ------------------------ | -------------------------------------------------------------------------------------------------- |
-| name        | string                 | The property name used as key in request or response body, which MUST be unique within a schema. |
-| description | ?string                | The property description for documentation, COULD be parsed as markdown.                         |
+| Property    | Type                                              | Description                                                                                      |
+| ----------- | ------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| name        | string                                            | The property name used as key in request or response body, which MUST be unique within a schema. |
+| description | ?string                                           | The property description for documentation, COULD be parsed as markdown.                         |
 | type        | [PropertyTypeDefinition](#propertytypedefinition) | The property type definition.                                                                    |
 
 ### PropertyTypeDefinition
 
 The `PropertyTypeDefinition` is used to describe how a property look like and how it MUST be handled.
 
-
 | Property | Type     | Description                                                                              |
-| ---------- | ---------- | ------------------------------------------------------------------------------------------ |
+| -------- | -------- | ---------------------------------------------------------------------------------------- |
 | context  | ?string  | The context of the schema which is used as type or`null` for build-in types.             |
 | type     | string   | The case sensitive name of the build-in type, or the used (internal or external) schema. |
 | options  | string[] | A list of property options.                                                              |
@@ -278,9 +270,8 @@ type is an external schema (e.g. from schema.org).
 
 These are the build-in property types of *elliRPC*. Additional types MAY be added by extensions of this specification.
 
-
 | Type     | Description                                                                                                           |
-| ---------- | ----------------------------------------------------------------------------------------------------------------------- |
+| -------- | --------------------------------------------------------------------------------------------------------------------- |
 | id       | Indicates that the property is used as id of type integer.                                                            |
 | idString | Indicates that the property is used as id of type string.                                                             |
 | uuid     | Indicates that the property is used as id and contains an uuid as defined in RFC 4122.                                |
@@ -290,10 +281,10 @@ These are the build-in property types of *elliRPC*. Additional types MAY be adde
 | boolean  | -                                                                                                                     |
 | email    | A string formatted as valid email address as defined by RFC 5322 and RFC 6530.                                        |
 | date     | A date string formatted as ISO 8601 date (YYYY-MM-DD).                                                                |
-| time     | A time string formatted as ISO 8601 time with timezone (hh:mm:ss±hh:mm).                                             |
-| datetime | A datetime string formatted as ISO 8601 combined date and time with timezone (YYYY-MM-DD\Thh:mm:ss±hh:mm).           |
+| time     | A time string formatted as ISO 8601 time with timezone (hh:mm:ss±hh:mm).                                              |
+| datetime | A datetime string formatted as ISO 8601 combined date and time with timezone (YYYY-MM-DD\Thh:mm:ss±hh:mm).            |
 | duration | A duration string formatted as ISO 8601 duration (P<date>T<time>).                                                    |
-| geoJson  | A json object formatted and to be interpreted as (GeoJson)[https://geojson.org/], defined in RFC 7946.                |
+| geoJson  | A json object formatted and to be interpreted as [GeoJson](https://geojson.org/), defined in RFC 7946.                |
 | wrapper  | A placeholder used in wrapper schemas where the wrapped content later should go. The schema it self MUST be abstract. |
 | object   | A simple json object without defined schema. Whenever possible, a concrete schema SHOULD be defined instead.          |
 
@@ -321,9 +312,8 @@ A client MUST ignore options it doesn't know but MUST support at least the offic
 
 Official available *elliRPC* options are:
 
-
 | Option            | Description                                                                                                   |
-| ------------------- | --------------------------------------------------------------------------------------------------------------- |
+| ----------------- | ------------------------------------------------------------------------------------------------------------- |
 | @nullable         | The property value is allowed to be`null`.                                                                    |
 | @notEmpty         | The property value is not allowed to be empty. Empty values are lists without values,`null` or empty strings. |
 | @positive         | The property value MUST be a positive number.                                                                 |
@@ -363,9 +353,8 @@ See endpoint definition to see how errors are responded.
 
 Error objects MUST be structured like this:
 
-
 | Property | Type                | Description                                                                                                                                                                            |
-| ---------- | --------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| -------- | ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | message  | string{`@language`} | The message contains an human-readable description which MAY is displayed to end-users. This property MUST contain an object with language designator as key and translation as value. |
 | code     | ?string             | The error code is an optional string value which contains an application specific error code for each kind of error.                                                                   |
 | source   | ?string             | A JSON Pointer[RFC6901](https://datatracker.ietf.org/doc/html/rfc6901) to the associated property in the request document which lead to the occurred error.                            |
@@ -408,17 +397,16 @@ others. If a prefix is used, the same prefix MUST be used for all endpoints.
 The following endpoints are defined by this specification, other endpoints MAY be defined by extensions of this
 specification.
 
-
-| Endpoint               | HTTP method | URL path                   | Description                                                                               |
-| ------------------------ | ------------- | ---------------------------- | ------------------------------------------------------------------------------------------- |
-| [Get Documentation](#endpoint-get-documentation)                              | GET         | /definitions               | This endpoint provides the full api definition.                                           |
-| [Get Package Definition](#endpoint-get-package-definition-todo-refactoring)   | GET         | /definitions/{packageName} | This endpoint provides the definition for a single package.                               |
-| [Execute Procedure](#endpoint-execute-procedure)                              | POST        | /procedures/execute        | This endpoint is used to execute a single procedure.                                      |
-| [Execute Bulk](#endpoint-execute-bulk-todo-refactoring)                       | POST        | /procedures/bulk           | This endpoint is used to execute multiple procedures independently of each other.         |
-| [Execute Transaction](#endpoint-execute-transaction--todo-refactoring)        | POST        | /procedures/transaction    | This endpoint is used to execute multiple procedures dependently in a single transaction. |
-| [Get File](#endpoint-get-file)                                                | GET         | /files/{fileName}          | This endpoint is used to retrieve a file from the server.                                 |
-| [Upload File](#endpoint-upload-file)                                          | POST or PUT | /files/{fileName}          | This endpoint is used to upload a file to the server.                                     |
-| [Delete File](#endpoint-delete-file)                                          | DELETE      | /files/{fileName}          | This endpoint is used to delete a file from the server.                                   |
+| Endpoint                                                   | HTTP method | URL path                   | Description                                                                               |
+| ---------------------------------------------------------- | ----------- | -------------------------- | ----------------------------------------------------------------------------------------- |
+| [Get Documentation](#endpoint-get-documentation)           | GET         | /definitions               | This endpoint provides the full api definition.                                           |
+| [Get Package Definition](#endpoint-get-package-definition) | GET         | /definitions/{packageName} | This endpoint provides the definition for a single package.                               |
+| [Execute Procedure](#endpoint-execute-procedure)           | POST        | /procedures/execute        | This endpoint is used to execute a single procedure.                                      |
+| [Execute Bulk](#endpoint-execute-bulk)                     | POST        | /procedures/bulk           | This endpoint is used to execute multiple procedures independently of each other.         |
+| [Execute Transaction](#endpoint-execute-transaction)       | POST        | /procedures/transaction    | This endpoint is used to execute multiple procedures dependently in a single transaction. |
+| [Get File](#endpoint-get-file)                             | GET         | /files/{fileName}          | This endpoint is used to retrieve a file from the server.                                 |
+| [Upload File](#endpoint-upload-file)                       | POST or PUT | /files/{fileName}          | This endpoint is used to upload a file to the server.                                     |
+| [Delete File](#endpoint-delete-file)                       | DELETE      | /files/{fileName}          | This endpoint is used to delete a file from the server.                                   |
 
 ### Endpoint: Get Documentation
 
@@ -443,15 +431,14 @@ via HTTP method `GET`.
 }
 ```
 
-
-| Property    | Type                | Description                                                                                    |
-| ------------- | --------------------- | ------------------------------------------------------------------------------------------------ |
-| application | string              | The name of the application.                                                                   |
-| description | string or null      | The description of the whole application. It COULD be parsed as markdown.                      |
-| extensions  | string[]            | A list of used specification extensions. Values MUST be URIs to their official specifications. |
+| Property    | Type                                      | Description                                                                                    |
+| ----------- | ----------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| application | string                                    | The name of the application.                                                                   |
+| description | string or null                            | The description of the whole application. It COULD be parsed as markdown.                      |
+| extensions  | string[]                                  | A list of used specification extensions. Values MUST be URIs to their official specifications. |
 | packages    | [PackageDefinition](#packagedefinition)[] | A list of all available packages within this application.                                      |
 
-### Endpoint: Get Package Definition (TODO Refactoring)
+### Endpoint: Get Package Definition
 
 This endpoint MUST respond with the definition for a single package. The URI for this endpoint MAY be used as the
 context in schema references.
@@ -459,38 +446,107 @@ context in schema references.
 The url path for this endpoint (after a possible prefix) MUST be `/definitions/{packageName}`. The endpoint MUST be
 accessible only via HTTP method `GET`.
 
-TODO: Request / Response
+#### Request
+
+```
+GET /definitions/examplePackage
+Content-Type: application/json
+```
+
+#### Response
+
+The endpoint MUST respond with a valid HTTP status `200 OK` if requested package is available. If a content type header
+is requested and the requested content type header does not match `application/json`, the server MUST respond with HTTP
+status `415 Unsupported Media Type` and a single error object in the response body. If the requested package does not
+exist, the server MUST respond with HTTP status `404 Not Found` and a single error object in the response body.
+
+The package response MUST be sent as json object of type [`PackageDefinition`](#packagedefinition) in the response body.
+
+*Example response body:*
+
+```json
+{
+  "name": "examplePackage",
+  "description": "This is an example package for documentation purposes.",
+  "procedures": [
+    {
+      "name": "exampleProcedure",
+      "description": "This is an example procedure for documentation purposes.",
+      "request": {
+        "data": null,
+        "meta": null
+      },
+      "response": {
+        "data": {
+          "context": null,
+          "schema": "exampleSchema",
+          "wrappedBy": null
+        },
+        "meta": null
+      }
+    }
+  ],
+  "schemas": [
+    {
+      "name": "exampleSchema",
+      "abstract": false,
+      "extends": null,
+      "description": "This is an example schema for documentation purposes.",
+      "properties": [
+        {
+          "name": "test",
+          "description": "Test property contains a simple string which is not nullable.",
+          "type": {
+            "context": null,
+            "type": "string",
+            "options": []
+          }
+        }
+      ]
+    }
+  ]
+}
+```
 
 ### Endpoint: Execute Procedure
 
-The procedure call endpoint SHOULD be used to execute a single procedure.
+This endpoint SHOULD be used to execute a single procedure.
 
 The url path for this endpoint (after a possible prefix) MUST be `/procedures/execute`. This endpoint MUST only be
 accessible via HTTP method `POST`.
 
 #### Request
 
-Request data MUST be sent as json object in the request body.
+The request body MUST contain a valid json object with properties `package`, `procedure`, `data` and `meta`.
 
-Request data MUST be structured like defined in the procedure definition and MUST be given under key `data`. The data
-MUST only consist of the defined properties. Missing properties MUST be treated as `null`, additional properties MUST be
-ignored.
+`package` and `procedure` MUST contain valid string values to identify the procedure which should be executed.
+
+The request data MUST be structured like defined in the procedure definition and MUST be given under key `data`. The
+data MUST only consist of the defined properties. Missing properties MUST be treated as `null`, additional properties
+MUST be ignored. Request data MUST be `null` if defined as `null` in the procedure definition.
 
 Request metadata MUST be structured like defined in the procedure definition and MUST be given under key `meta`. The
 metadata MUST only consist of the defined properties. Missing properties MUST be treated as `null`, additional
-properties MUST be ignored.
+properties MUST be ignored. Metadata MUST be `null` if defined as `null` in the procedure definition.
 
-The request MAY contain additional headers for example for caching or authorization, which are not parts of this
-specification. Unknown headers MUST be ignored by servers.
+The request MAY contain additional headers for example for authorization, which is not part of this specification.
+Unknown headers MUST be ignored by servers.
+
+*Example request:*
 
 ```
 POST /procedures/execute
 Content-Type: application/json
+```
 
+with body
+
+```
 {
-    "data": {
-        "test": "test"
-    }
+    "package": "examplePackage",
+    "procedure": "exampleProcedure",
+    "data": null,
+    "meta": null
 }
 ```
 
@@ -506,12 +562,11 @@ status `415 Unsupported Media Type` and a single error object in the response bo
 
 The response body MUST be a valid json object structured like:
 
-
-| Property | Type    | Description                                                                                           |
-| ---------- | --------- | ------------------------------------------------------------------------------------------------------- |
-| success  | boolean | Indicator if procedure execution was successful or not.                                               |
-| data     | ?object | The procedure result data for the client, structured as defined by the procedure response definition. |
-| meta     | ?object | Additional meta data for the client, structured as defined by the procedure response definition.      |
+| Property | Type                       | Description                                                                                           |
+| -------- | -------------------------- | ----------------------------------------------------------------------------------------------------- |
+| success  | boolean                    | Indicator if procedure execution was successful or not.                                               |
+| data     | ?object                    | The procedure result data for the client, structured as defined by the procedure response definition. |
+| meta     | ?object                    | Additional meta data for the client, structured as defined by the procedure response definition.      |
 | errors   | [Error](#error-handling)[] | A list of error objects.                                                                              |
 
 The response data MUST only contain the properties defined by response schema. The client MUST ignore any additional
@@ -521,177 +576,234 @@ the defined property type.
 The response MAY contain additional headers for example for caching, which is not parts of this specification. Unknown
 headers MUST be ignored by clients.
 
-**Example Response with empty data and meta and without errors:**
+**Example Response with data and meta and without errors:**
 
 ```json
 {
   "success": true,
-  "data": null,
+  "data": {
+    "test": "Test value"
+  },
   "meta": null,
   "errors": []
 }
 ```
 
-### Endpoint: Execute Bulk (TODO Refactoring)
+### Endpoint: Execute Bulk
 
-The `bulk` endpoint SHOULD be used if several procedures are to be executed directly one after the other, but without
+This endpoint SHOULD be used if several procedures are to be executed directly one after the other, but without
 dependencies among each other. Using the bulk request can improve performance by reducing unnecessary HTTP requests.
 
-The url path for this endpoint MUST be `/elliRPC/bulk`.
+The url path for this endpoint (after a possible prefix) MUST be `/procedures/bulk`. This endpoint MUST only be
+accessible via HTTP method `POST`.
 
 #### Request
 
-This endpoint MUST be called with HTTP method `POST`. The request body MUST be formatted as JSON, where all procedure
-execution requests are listed under the key `procedures`.
+The request body MUST be formatted as JSON, where all procedure calls are listed under the key `procedures`.
 
 Since there must be no dependencies between the procedures in this request, the order of execution on the server is not
 relevant and may differ from the order of the list. Likewise, the server could execute several of the procedures at the
 same time.
 
-Each procedure execution request MUST contain the keys `package`, `procedure`, `data` and `meta`. `data` and `meta` MUST
-be `null`, if they are defined as `null` in the procedure request definition. `data` and `meta` MUST be valid json
-objects matching the defined request schema if they are not defined as `null`.
+Each procedure call MUST contain the properties `package`, `procedure`, `data` and `meta`.
+
+`package` and `procedure` MUST contain valid string values to identify the procedure which should be executed.
+
+Data for the procedure execution MUST be structured like defined in the procedure definition and MUST be given under
+key `data` for each procedure call. The data MUST only consist of the defined properties. Missing properties MUST be
+treated as `null`, additional properties MUST be ignored. `data` MUST be `null` if defined as `null` in the procedure
+definition.
+
+Metadata for the procedure execution MUST be structured like defined in the procedure definition and MUST be given under
+key `meta` for each procedure call. The metadata MUST only consist of the defined properties. Missing properties MUST be
+treated as `null`, additional properties MUST be ignored. `meta` MUST be `null` if defined as `null` in the procedure
+definition.
+
+The request MAY contain additional headers for example for authorization, which is not part of this specification.
+Unknown headers MUST be ignored by servers.
+
+*Example request:*
 
 ```
 POST /procedures/bulk
 Content-Type: application/json
+```
 
+with body
+
+```json
 {
-    "procedures": [
-        {
-            "package": {packageName},
-            "procedure": {procedureName},
-            "meta": {metaData},
-            "data": {procedureData}
-        }
-    ]
+  "procedures": [
+    {
+      "package": "examplePackage",
+      "procedure": "exampleProcedure",
+      "data": null,
+      "meta": null
+    }
+  ]
 }
 ```
 
 #### Response
 
-The response MUST NOT be empty and MUST contain valid `JSON`. It MUST contain a procedure result for each requested
-procedure execution.
+The response MUST NOT be empty and MUST contain a valid json object. It MUST contain a procedure result for each
+requested procedure call.
 
-The endpoint MUST respond with a valid HTTP status `200 OK` if called with a valid data structure. If the request data
+The endpoint MUST respond with a valid HTTP status `200 OK` if called with a valid data structure. Application errors
+MUST NOT change the HTTP status but MUST be reported via success indicator in the response object. If the request data
 does not match the defined schema, does not contain valid json or if package or procedure does not exist, the server
 MUST respond with HTTP status `400 Bad Request` and a single error object in the response body. If a content type header
 is requested and the requested content type header does not match `application/json`, the server MUST respond with HTTP
 status `415 Unsupported Media Type` and a single error object in the response body.
 
 Procedure results MUST appear in the same order as requested and are summarized under key `procedures` in the response
-object. Each result consists of the requested `package`, the requested `procedure`, the `successful` execution
-indicator, the procedure `data` and `meta`. `data` MUST be a json object formatted according to the procedure response
-definition. `data` MAY be `null`, if the procedure response is defined as nullable. If `successful` is `false`, `data`
-MUST contain the occurred error, formatted as defined by the global error object definition. `data` MAY be `null`, if no
-error object is defined. `meta` MUST be a set of key-value-pairs MAY be containing additional information which would
-otherwise sent via HTTP headers.
+object. Each result consists of the requested `package`, the requested `procedure`, the `success` execution indicator,
+the procedure result `data` and `meta`. `data` MUST be a json object formatted according to the procedure response
+definition. `data` MUST be `null` if defined as `null` by the procedure definition. If `success` is `false` the
+procedure call has failed. `meta` MUST be a json object formatted according to the procedure response definition. `meta`
+MUST be `null` if defined as `null` by the procedure definition. If any errors (critical or not) occurred on procedure
+call, they SHOULD be reported and MUST be given as list of error objects under key `errors` for each procedure result.
 
-The server SHOULD always respond with HTTP status `200 OK`. If the client receive any other HTTP status from the server,
-it MUST assume, that all procedure executions failed in case of a server problem.
+*Example response body:*
 
-```
-Content-Type: application/json
-
+```json
 {
-    "procedures": [
-        {
-            "package": {packageName},
-            "procedure": {procedureName},
-            "success": {true|false},
-            "data": {procedureResponse},
-            "meta": {metaData},
-            "errors": {listOfErrorObjects}
-        }
-    ]
+  "procedures": [
+    {
+      "package": "examplePackage",
+      "procedure": "exampleProcedure",
+      "success": true,
+      "data": {
+        "test": "Test value"
+      },
+      "meta": null,
+      "errors": []
+    }
+  ]
 }
 ```
 
-### Endpoint: Execute Transaction  (TODO Refactoring)
+### Endpoint: Execute Transaction
 
-The `transaction` endpoint MUST be used if several procedures have to be executed contiguously and build on each other
-or depend on each other. If an error occurs during the execution of a procedure, all previous procedures MUST be undone
-and the entire request MUST fail.
+This endpoint MUST be used if several procedures have to be executed contiguously and build on each other or depend on
+each other. If an error occurs during the execution of a procedure, all previous procedures MUST be undone and the
+entire request MUST fail.
 
-The url path for this endpoint MUST be `/procedures/transaction`.
+The url path for this endpoint (after a possible prefix) MUST be `/procedures/transaction`. This endpoint MUST only be
+accessible via HTTP method `POST`.
 
 #### Request
 
-The `transaction` endpoint MUST be called with HTTP method `POST`. The request body MUST be formatted as JSON, where all
-procedure execution requests are listed under the key `procedures`.
+The request body MUST be formatted as a valid json object, where all procedure calls are listed under the
+key `procedures`.
 
-Since there is a dependencies between the procedures in this request, the order of execution on the server is relevant
-and MUST NOT differ from the order of the list. The server MUST execute a maximum of one procedure at a time and MUST
-execute the procedures all in sequence. If an execution fails, the server MUST undo the previous executions and MUST NOT
-execute any further procedure. However, the successful procedures are marked as successful in the response, so that it
-is clear at which point the error occurred.
+Since there are dependencies between the procedures in this request, the order of execution on the server is relevant
+and MUST NOT differ from the order of the requested list. The server MUST execute a maximum of one procedure at a time
+and MUST execute the procedures all in sequence. If an execution fails, the server MUST undo the previous executions and
+MUST NOT execute any further procedure. However, the successful procedures are marked as successful in the response, so
+that it is clear at which point the error occurred.
 
-Each procedure execution request MUST contain the keys `package`, `procedure`, `data` and `meta`. `data` and `meta` MUST
-be `null`, if they are defined as `null` in the procedure request definition. `data` and `meta` MUST be valid json
-objects matching the defined request schema if they are not defined as `null`.
+Each procedure call MUST contain the properties `package`, `procedure`, `data` and `meta`.
+
+`package` and `procedure` MUST contain valid string values to identify the procedure which should be executed.
+
+Data for the procedure execution MUST be structured like defined in the procedure definition and MUST be given under
+key `data` for each procedure call. The data MUST only consist of the defined properties. Missing properties MUST be
+treated as `null`, additional properties MUST be ignored. `data` MUST be `null` if defined as `null` in the procedure
+definition.
+
+Metadata for the procedure execution MUST be structured like defined in the procedure definition and MUST be given under
+key `meta` for each procedure call. The metadata MUST only consist of the defined properties. Missing properties MUST be
+treated as `null`, additional properties MUST be ignored. `meta` MUST be `null` if defined as `null` in the procedure
+definition.
+
+The request MAY contain additional headers for example for authorization, which is not part of this specification.
+Unknown headers MUST be ignored by servers.
+
+*Example request:*
 
 ```
 POST /procedures/transaction
 Content-Type: application/json
+```
 
+with body
+
+```json
 {
-    "procedures": [
-        {
-            "package": {packageName},
-            "procedure": {procedureName},
-            "meta": {metaData},
-            "data": {procedureData}
-        }
-    ]
+  "procedures": [
+    {
+      "package": "examplePackage",
+      "procedure": "exampleProcedure",
+      "data": null,
+      "meta": null
+    },
+    {
+      "package": "examplePackage",
+      "procedure": "exampleProcedure",
+      "data": null,
+      "meta": null
+    }
+  ]
 }
 ```
 
 #### Response
 
-The response MUST NOT be empty and MUST contain valid `JSON`. It MUST contain a procedure result for each executed
-procedure and MUST NOT contain results for non executed procedures.
+The response MUST NOT be empty and MUST contain valid `JSON`. It MUST contain a procedure result for each called
+procedure under key `procedures` and MUST NOT contain results for non executed procedures.
 
-The endpoint MUST respond with a valid HTTP status `200 OK` if called with a valid data structure. If the request data
-does not match the defined schema, does not contain valid json or if package or procedure does not exist, the server
-MUST respond with HTTP status `400 Bad Request` and a single error object in the response body. If a content type header
-is requested and the requested content type header does not match `application/json`, the server MUST respond with HTTP
+The endpoint MUST respond with a valid HTTP status `200 OK` if all procedures have been executed successfully. In case
+of an error the server MUST respond with a suitable HTTP status for the occurred error. If a client receives a HTTP
+status other than `200 OK`, it MUST assume that all procedures have failed or are not executed.It SHOULD parse the
+response to find the failed procedure (`"success": false`) and the concrete error if provided. If the request data does
+not match the defined schema, does not contain valid json or if package or procedure does not exist, the server MUST
+respond with HTTP status `400 Bad Request` and a single error object in the response body. If a content type header is
+requested and the requested content type header does not match `application/json`, the server MUST respond with HTTP
 status `415 Unsupported Media Type` and a single error object in the response body.
 
 Procedure results MUST appear in the same order as requested and are summarized under key `procedures` in the response
-object. Each result consists of the requested `package`, the requested `procedure`, the `successful` execution
-indicator, the procedure `data` and `meta`. `data` MUST be a json object formatted according to the procedure response
-definition. `data` MAY be `null`, if the procedure response is defined as nullable. If `successful` is `false`, `data`
-MUST contain the occurred error, formatted as defined by the global error object definition. `data` MAY be `null`, if no
-error object is defined. `meta` MUST be a set of key-value-pairs MAY be containing additional information which would
-otherwise sent via HTTP headers.
+object. Each result consists of the requested `package`, the requested `procedure`, the `success` execution indicator,
+the procedure result `data` and `meta`. `data` MUST be a json object formatted according to the procedure response
+definition. `data` MUST be `null` if defined as `null` by the procedure definition. If `success` is `false` the
+procedure call has failed. `meta` MUST be a json object formatted according to the procedure response definition. `meta`
+MUST be `null` if defined as `null` by the procedure definition. If any errors (critical or not) occurred on procedure
+call, they SHOULD be reported and MUST be given as list of error objects under key `errors` for each procedure result.
 
-The server MUST respond with HTTP status `200 OK` if all procedures have been executed successfully. In case of an error
-the server MUST respond with a suitable HTTP status for the occurred error. If a client receives a HTTP status other
-than `200 OK`, it MUST assume that all procedures have failed or are not executed. It SHOULD parse the response to find
-the failed procedure (`"success": false`) and the concrete error if provided.
+*Example response body:*
 
-```
-Content-Type: application/json
-
+```json
 {
-    "procedures": [
-        {
-            "package": {packageName},
-            "procedure": {procedureName},
-            "success": {true|false},
-            "data": {procedureResponse},
-            "meta": {metaData},
-            "errors": {listOfErrorObjects}
-        }
-    ]
+  "procedures": [
+    {
+      "package": "examplePackage",
+      "procedure": "exampleProcedure",
+      "success": true,
+      "data": {
+        "test": "Test value"
+      },
+      "meta": null,
+      "errors": []
+    },
+    {
+      "package": "examplePackage",
+      "procedure": "exampleProcedure",
+      "success": true,
+      "data": {
+        "test": "Test value"
+      },
+      "meta": null,
+      "errors": []
+    }
+  ]
 }
 ```
 
 ### Endpoint: Get File
 
-The `get file` endpoint is used to retrieve a file from the server.
+This endpoint is used to retrieve a file from the server.
 
-The `get file` endpoint MUST be called via HTTP method `GET`.
+This endpoint MUST be called via HTTP method `GET`.
 
 The url path for this endpoint MUST be `/elliRPC/files/{fileName}`.
 
@@ -717,11 +829,11 @@ If a file could not be found on the server, the server MUST respond with HTTP st
 
 ### Endpoint: Upload File
 
-The `upload file` endpoint is used to store a file on the server.
+This endpoint is used to store a file on the server.
 
-The `upload file` endpoint MUST be called via HTTP method `POST` or `PUT`. If called via `POST` a file will be created
-on the server if it does not already exist, otherwise an error will be happened. If called via `PUT` a file will be
-created on the server if it does not already exist, otherwise the existing file will be replaced with the new one.
+This endpoint MUST be called via HTTP method `POST` or `PUT`. If called via `POST` a file will be created on the server
+if it does not already exist, otherwise an error will be happened. If called via `PUT` a file will be created on the
+server if it does not already exist, otherwise the existing file will be replaced with the new one.
 
 The url path for this endpoint MUST be `/elliRPC/files/{fileName}`.
 
@@ -747,9 +859,9 @@ The response MAY contain additional HTTP headers. Unknown headers MUST be ignore
 
 ### Endpoint: Delete File
 
-The `delete file` endpoint is used to delete a file from the server.
+This endpoint is used to delete a file from the server.
 
-The `delete file` endpoint MUST be called via HTTP method `DELETE`.
+This endpoint MUST be called via HTTP method `DELETE`.
 
 The url path for this endpoint MUST be `/elliRPC/files/{fileName}`.
 
@@ -764,7 +876,7 @@ Unknown headers MUST be ignored by servers.
 The server MUST respond with HTTP status `204 No Content` in case of success. Otherwise, it MUST respond with a suitable
 HTTP error.
 
-## Extending this specification (TODO Refactoring)
+## Extending this specification
 
 TODO
 
