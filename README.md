@@ -1,16 +1,49 @@
 Specification: elliRPC
 ======================
 
-<small>provided by [Ellinaut](https://github.com/Ellinaut) </small>
+<small>provided by [Ellinaut](https://github.com/Ellinaut)</small>
 
 ---
+
+## Table of Contents
+
+1. [Introduction](#introduction)
+2. [Conventions and Terms](#conventions-and-terms)
+    1. [Naming Conventions](#naming-conventions)
+    2. [Client Responsibilities](#client-responsibilities)
+    3. [Server Responsibilities](#server-responsibilities)
+    4. [Packages, Procedures and Schemas](#packages-procedures-and-schemas)
+3. [Definition Structures](#definition-structures)
+    1. [PackageDefinition](#packagedefinition)
+    2. [ProcedureDefinition](#proceduredefinition)
+    3. [TransportDefinition](#transportdefinition)
+    4. [DataDefinition](#datadefinition)
+    5. [SchemaReferenceDefinition](#schemareferencedefinition)
+    6. [SchemaDefinition](#schemadefinition)
+    7. [PropertyDefinition](#propertydefinition)
+    8. [PropertyTypeDefinition](#propertytypedefinition)
+        1. [Build-In Property Types](#build-in-property-types)
+        2. [Property Options](#property-options)
+            1. [Option Chaining](#option-chaining)
+4. [Error Handling](#error-handling)
+5. [Versioning](#versioning)
+6. [Endpoints](#endpoints)
+    1. [Endpoint: Get Documentation](#endpoint-get-documentation)
+    2. [Endpoint: Get Package Definition](#endpoint-get-package-definition)
+    3. [Endpoint: Execute Procedure](#endpoint-execute-procedure)
+    4. [Endpoint: Execute Bulk](#endpoint-execute-bulk)
+    5. [Endpoint: Execute Transaction](#endpoint-execute-transaction)
+    6. [Endpoint: Get File](#endpoint-get-file)
+    7. [Endpoint: Upload File](#endpoint-upload-file)
+    8. [Endpoint: Delete File](#endpoint-delete-file)
+7. [Extending this specification](#extending-this-specification)
 
 ## Introduction
 
 *elliRPC* is a specification for how a client should execute remote procedure calls (RPCs) over HTTP, and how a server
 should respond the procedure execution results to the client.
 
-## Conventions
+## Conventions and Terms
 
 The keywords “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and
 “OPTIONAL” in this document are to be interpreted as described in [RFC 2119](https://tools.ietf.org/html/rfc2119).
@@ -83,8 +116,7 @@ according to this standard.
 The definition structures are meant to be used for documentation purposes, for automatically client creation and for
 request/response validations.
 
-Definition structures are meanly used in the documentation- and package-endpoints where they are present as JSON
-objects.
+Definition structures are used in the documentation- and package-endpoints where they are present as JSON objects.
 
 The following descriptions for available definition structures are structured as tables which contains the
 columns `Property`, `Type` and `Description`. The column `Property` contains the technical name of a property, which
@@ -100,11 +132,12 @@ description MAY contain more detailed specifications for a property.
 The `PackageDefinition` is used to describe a package within an application.
 
 | Property    | Type                                          | Description                                                                                            |
-| ----------- | --------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+|-------------|-----------------------------------------------|--------------------------------------------------------------------------------------------------------|
 | name        | string                                        | The name of the package. This name MUST be unique within an application context.                       |
 | description | ?string                                       | The human readable description of the package for documentation purposes, COULD be parsed as markdown. |
 | procedures  | [ProcedureDefinition](#proceduredefinition)[] | The list of procedures provided by this package.                                                       |
 | schemas     | [SchemaDefinition](#schemadefinition)[]       | The list of schemas provided by this package.                                                          |
+| errors      | [ErrorDefinition](#errordefinition)[]         | The list of possible errors within this package.                                                       |
 
 A full `PackageDefinition` as JSON looks like:
 
@@ -112,6 +145,7 @@ A full `PackageDefinition` as JSON looks like:
 {
     "name": {packageName},
     "description": {packageDescription}|null,
+    "fallbackLanguage": {packageFallbackLanguage}|null,
     "procedures": [
         {
             "name": {procedureName},
@@ -124,6 +158,7 @@ A full `PackageDefinition` as JSON looks like:
                         "context": {schemaContext}|null,
                         "schema": {schemaName}
                     },
+                    "nullable": true|false,
                 },
                 "meta": {
                     "context": {schemaContext}|null,
@@ -137,13 +172,15 @@ A full `PackageDefinition` as JSON looks like:
                     "wrappedBy": {
                         "context": {schemaContext}|null,
                         "schema": {schemaName}
-                    }
+                    },
+                    "nullable": true|false,
                 },
                 "meta": {
                     "context": {schemaContext}|null,
                     "schema": {schemaName}
                 }
-            }
+            },
+            "errors": {errorCodeList}
         }
     ],
     "schemas": [
@@ -167,6 +204,16 @@ A full `PackageDefinition` as JSON looks like:
                 }
             ]
         }
+    ],
+    "errors": [
+      {
+         "code": {errorCode},
+         "description": {errorDescription},
+         "context": {
+             "context": {schemaContext},
+             "schema": {schemaName}
+         }
+      }
     ]
 }
 ```
@@ -175,12 +222,13 @@ A full `PackageDefinition` as JSON looks like:
 
 The `ProcedureDefinition` is used to describe a single procedure within a package.
 
-| Property    | Type                                        | Description                                                                               |
-| ----------- | ------------------------------------------- | ----------------------------------------------------------------------------------------- |
-| name        | string                                      | The name of the procedure. This name MUST be unique within a package context.             |
-| description | string or null                              | The description of the procedure for documentation purposes, COULD be parsed as markdown. |
-| request     | [TransportDefinition](#transportdefinition) | The definition of the procedure request.                                                  |
-| response    | [TransportDefinition](#transportdefinition) | The definition of the procedure response.                                                 |
+| Property    | Type                                        | Description                                                                                                        |
+|-------------|---------------------------------------------|--------------------------------------------------------------------------------------------------------------------|
+| name        | string                                      | The name of the procedure. This name MUST be unique within a package context.                                      |
+| description | string or null                              | The description of the procedure for documentation purposes, COULD be parsed as markdown.                          |
+| request     | [TransportDefinition](#transportdefinition) | The definition of the procedure request.                                                                           |
+| response    | [TransportDefinition](#transportdefinition) | The definition of the procedure response.                                                                          |
+| errors      | string[]                                    | The list of possible error codes for this procedure. Each code SHOULD be defined as possible error in the package. |
 
 ### TransportDefinition
 
@@ -194,18 +242,20 @@ response for a procedure call.
 
 **Note:** `data` MUST contain all required data which are essential for a procedure call or which have an impact to the
 procedure logic. `meta` MUST contain only data, which COULD help to process a procedure or indicates client/server
-behaviours but is not relevant to the procedure logic itself. `meta` COULD include sorting, pagination or caching
-parameters. `meta` or partials of it MAY be ignored by clients or servers while `data` MUST be observed.
+behaviours but is not relevant to the procedure logic itself. `mata` is always optional, so if its `null`, it MUST not
+have an impact to the procedure logic. `meta` COULD include sorting, pagination or caching parameters. `meta` or
+partials of it MAY be ignored by clients or servers while `data` MUST be observed.
 
 ### DataDefinition
 
 The `DataDefinition` is used to describe how the `data` property MUST be structured in requests or responses.
 
 | Property  | Type                                                     | Description                                                                     |
-| --------- | -------------------------------------------------------- | ------------------------------------------------------------------------------- |
+|-----------|----------------------------------------------------------|---------------------------------------------------------------------------------|
 | context   | ?string                                                  | The context if the schema isn't defined in the same package.                    |
 | schema    | string                                                   | The case sensitive name of (internal or external) schema, which should be used. |
 | wrappedBy | ?[SchemaReferenceDefinition](#schemareferencedefinition) | The schema reference to the schema, which is used as wrapper.                   |
+| nullable  | boolean                                                  | Indicates if data MUST contain an object or also COULD be null.                 |
 
 **Note:** The context MUST be `null` for a schema in the same package. It MUST be `elliRPC` for a pre-defined schema
 from this specification. It MUST be the package name if the schema is defined in another package of the same
@@ -344,6 +394,16 @@ other way around, i.e. `@nullable` and then `@language`, the value of the proper
 language as key and a list with several translated strings as value or `null` but defined language strings can not
 be `null`.
 
+### ErrorDefinition
+
+The `ErrorDefinition` is used to describe a possible error and how it COULD be customized.
+
+| Property    | Type                                                     | Description                                                                       |
+|-------------|----------------------------------------------------------|-----------------------------------------------------------------------------------|
+| code        | string                                                   | The unique error code within this package.                                        |
+| description | ?string                                                  | The human readable description how and when this error could occur.               |
+| context     | ?[SchemaReferenceDefinition](#schemareferencedefinition) | The schema reference to the schema, which is used for the optional error context. |
+
 ## Error Handling
 
 The application MAY abort the procedure call immediately if an error occurs but COULD also continue execution to respond
@@ -354,10 +414,11 @@ See endpoint definition to see how errors are responded.
 Error objects MUST be structured like this:
 
 | Property | Type                | Description                                                                                                                                                                            |
-| -------- | ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+|----------|---------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | message  | string{`@language`} | The message contains an human-readable description which MAY is displayed to end-users. This property MUST contain an object with language designator as key and translation as value. |
 | code     | ?string             | The error code is an optional string value which contains an application specific error code for each kind of error.                                                                   |
 | source   | ?string             | A JSON Pointer[RFC6901](https://datatracker.ietf.org/doc/html/rfc6901) to the associated property in the request document which lead to the occurred error.                            |
+| context  | ?object             | An optional object with contextual properties for this error. The schema SHOULD be previously be defined by an error definition.                                                       |
 
 Here is how this would look like in JSON:
 
@@ -367,7 +428,8 @@ Here is how this would look like in JSON:
     "en": "This is an error example."
   },
   "code": "not_found",
-  "source": "/data/test"
+  "source": "/data/test",
+  "context": null
 }
 ```
 
@@ -385,7 +447,8 @@ Major changes to defined structures are not allowed. Instead, an existing struct
 major changes are made. Versioning MAY be achieved via different names for old and new structures.
 
 Real api versioning MAY be achieved by providing multiple versions of the same api under different url paths, where the
-url path SHOULD contain the version number as a prefix before the actual *elliRPC* path.
+url path SHOULD contain the version number as a prefix before the actual *elliRPC* path or by replacing packages and
+naming the packages with versions.
 
 ## Endpoints
 
