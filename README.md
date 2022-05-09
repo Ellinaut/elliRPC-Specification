@@ -886,7 +886,7 @@ The response MUST contain a valid `Content-Type` header.
 The response MAY contain additional HTTP headers for example for caching, which is not part of this specification.
 Unknown headers MUST be ignored by clients.
 
-The response body MUST contain only the file content.
+The response body MUST contain only the raw file content.
 
 If a file could not be found on the server, the server MUST respond with HTTP status `404 Not Found`.
 
@@ -910,12 +910,12 @@ Unknown headers MUST be ignored by servers.
 
 The request SHOULD contain a valid `Content-Type` header.
 
-The request body MUST only contain the file content.
+The request body MUST only contain the raw file content.
 
 The server MUST respond with HTTP status `201 Created` if the file upload was successfully. Each other HTTP status MUST
 be assumed as upload failed.
 
-This server MAY respond with the HTTP header `Content-Disposition` to give a new location where the file was created.
+This server MAY respond with the HTTP header `Location` to give a new location where the file was created.
 This MAY differ from the upload destination.
 
 The response MAY contain additional HTTP headers. Unknown headers MUST be ignored by clients.
