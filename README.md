@@ -222,13 +222,14 @@ A full `PackageDefinition` as JSON looks like:
 
 The `ProcedureDefinition` is used to describe a single procedure within a package.
 
-| Property    | Type                                        | Description                                                                                                        |
-|-------------|---------------------------------------------|--------------------------------------------------------------------------------------------------------------------|
-| name        | string                                      | The name of the procedure. This name MUST be unique within a package context.                                      |
-| description | string or null                              | The description of the procedure for documentation purposes, COULD be parsed as markdown.                          |
-| request     | [TransportDefinition](#transportdefinition) | The definition of the procedure request.                                                                           |
-| response    | [TransportDefinition](#transportdefinition) | The definition of the procedure response.                                                                          |
-| errors      | string[]                                    | The list of possible error codes for this procedure. Each code SHOULD be defined as possible error in the package. |
+| Property     | Type                                            | Description                                                                                                                                                                                                                                          |
+|--------------|-------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| name         | string                                          | The name of the procedure. This name MUST be unique within a package context.                                                                                                                                                                        |
+| description  | string or null                                  | The description of the procedure for documentation purposes, COULD be parsed as markdown.                                                                                                                                                            |
+| request      | [TransportDefinition](#transportdefinition)     | The definition of the procedure request.                                                                                                                                                                                                             |
+| response     | [TransportDefinition](#transportdefinition)     | The definition of the procedure response.                                                                                                                                                                                                            |
+| errors       | string[]                                        | The list of possible error codes for this procedure. Each code SHOULD be defined as possible error in the package.                                                                                                                                   |
+| allowedUsage | string or null <br/>  STANDALONE or TRANSACTION | If value is "STANDALONE" this procedure can not be used in transactions, if value is "TRANSACTION" this procedure can only be used in transactions, if value is `null` the procedure can be used within a transactions and outside of a transaction. |
 
 ### TransportDefinition
 
@@ -236,7 +237,7 @@ The `TransportDefinition` is used to describe how data MUST be transferred betwe
 response for a procedure call.
 
 | Property | Type                                                     | Description                                                                          |
-| -------- | -------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+|----------|----------------------------------------------------------|--------------------------------------------------------------------------------------|
 | data     | ?[DataDefinition](#datadefinition)                       | The structure how data MUST be sent. MUST be`null` if no data can be sent.           |
 | meta     | ?[SchemaReferenceDefinition](#schemareferencedefinition) | The structure how meta data MUST be sent. MUST be`null` if no meta data can be sent. |
 
@@ -546,7 +547,9 @@ The package response MUST be sent as json object of type [`PackageDefinition`](#
           "wrappedBy": null
         },
         "meta": null
-      }
+      },
+      "errors": [],
+      "allowedUsage": null
     }
   ],
   "schemas": [
@@ -577,6 +580,8 @@ This endpoint SHOULD be used to execute a single procedure.
 
 The url path for this endpoint (after a possible prefix) MUST be `/procedures/execute`. This endpoint MUST only be
 accessible via HTTP method `POST`.
+
+This endpoint can only execute procedures which are defined as `null` or `STANDALONE` via property "allowedUsage".
 
 #### Request
 
@@ -659,6 +664,8 @@ dependencies among each other. Using the bulk request can improve performance by
 
 The url path for this endpoint (after a possible prefix) MUST be `/procedures/bulk`. This endpoint MUST only be
 accessible via HTTP method `POST`.
+
+This endpoint can only execute procedures which are defined as `null` or `STANDALONE` via property "allowedUsage".
 
 #### Request
 
@@ -754,6 +761,8 @@ entire request MUST fail.
 
 The url path for this endpoint (after a possible prefix) MUST be `/procedures/transaction`. This endpoint MUST only be
 accessible via HTTP method `POST`.
+
+This endpoint can only execute procedures which are defined as `null` or `TRANSACTION` via property "allowedUsage".
 
 #### Request
 
