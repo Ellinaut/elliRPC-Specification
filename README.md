@@ -321,28 +321,34 @@ type is an external schema (e.g. from schema.org).
 
 These are the build-in property types of *elliRPC*. Additional types MAY be added by extensions of this specification.
 
-| Type     | Description                                                                                                           |
-| -------- | --------------------------------------------------------------------------------------------------------------------- |
-| id       | Indicates that the property is used as id of type integer.                                                            |
-| idString | Indicates that the property is used as id of type string.                                                             |
-| uuid     | Indicates that the property is used as id and contains an uuid as defined in RFC 4122.                                |
-| string   | -                                                                                                                     |
-| integer  | -                                                                                                                     |
-| decimal  | -                                                                                                                     |
-| boolean  | -                                                                                                                     |
-| email    | A string formatted as valid email address as defined by RFC 5322 and RFC 6530.                                        |
-| date     | A date string formatted as ISO 8601 date (YYYY-MM-DD).                                                                |
-| time     | A time string formatted as ISO 8601 time with timezone (hh:mm:ss±hh:mm).                                              |
-| datetime | A datetime string formatted as ISO 8601 combined date and time with timezone (YYYY-MM-DD\Thh:mm:ss±hh:mm).            |
-| duration | A duration string formatted as ISO 8601 duration (P<date>T<time>).                                                    |
-| geoJson  | A json object formatted and to be interpreted as [GeoJson](https://geojson.org/), defined in RFC 7946.                |
-| wrapper  | A placeholder used in wrapper schemas where the wrapped content later should go. The schema it self MUST be abstract. |
-| object   | A simple json object without defined schema. Whenever possible, a concrete schema SHOULD be defined instead.          |
-
-**Note:** Each schema MUST only have one id property (Property of type `id`, `idString` or `uuid`).
+| Type          | Description                                                                                                           |
+|---------------|-----------------------------------------------------------------------------------------------------------------------|
+| uuid          | A string formatted as valid uuid defined by RFC 4122.                                                                 |
+| string        | -                                                                                                                     |
+| integer       | -                                                                                                                     |
+| decimal       | -                                                                                                                     |
+| boolean       | -                                                                                                                     |
+| email         | A string formatted as valid email address as defined by RFC 5322 and RFC 6530.                                        |
+| uri           | A string formatted as valid uri defined by RFC 3986.                                                                  |
+| dataUrl       | A string formatted as valid data url defined by RFC 2397.                                                             |
+| fileReference | A string formatted as valid uri to a file ressource.                                                                  |
+| htmlContent   | A string which contains html content.                                                                                 |
+| xmlContent    | A string which contains xml content.                                                                                  |
+| mdContent     | A string which contains markdown content.                                                                             |
+| svgContent    | A string which contains svg content.                                                                                  |
+| binaryContent | A string which contains binary content encoded as base64.                                                             |
+| date          | A date string formatted as ISO 8601 date (YYYY-MM-DD).                                                                |
+| time          | A time string formatted as ISO 8601 time with timezone (hh:mm:ss±hh:mm).                                              |
+| datetime      | A datetime string formatted as ISO 8601 combined date and time with timezone (YYYY-MM-DD\Thh:mm:ss±hh:mm).            |
+| duration      | A duration string formatted as ISO 8601 duration (P<date>T<time>).                                                    |
+| geoJson       | A json object formatted and to be interpreted as [GeoJson](https://geojson.org/), defined in RFC 7946.                |
+| wrapper       | A placeholder used in wrapper schemas where the wrapped content later should go. The schema it self MUST be abstract. |
+| object        | A simple json object without defined schema. Whenever possible, a concrete schema SHOULD be defined instead.          |
 
 **Note:** A schema which defines a property as `wrapper` MUST be abstract. A schema MUST only contain exactly
-one `wrapper` property.
+one `wrapper` property. If the schema is used at "wrappedBy", the wrapper property contains an object matching the given
+schema, which is wrapped by the schema which defines the wrapper property. For example: The wrapper schema could be a
+reusable list which will be used with different values depending on the procedure where is will be used.
 
 #### Property Options
 
@@ -354,6 +360,9 @@ Options MUST be applied in the order they are defined.
 
 Pre-defined *elliRPC* options MUST begin with an @ sign in the name and MAY have an impact on the JSON structure.
 
+Option MAY specify more details about itself. If an option specifies more details, details are provided in round
+brackets behind the option: `@option(details)`.
+
 Options SHOULD be used by clients and servers to validate data structures before processing.
 
 An application MAY offer more custom options. Custom option names MUST NOT begin with an @ sign and MUST NOT have an
@@ -363,19 +372,26 @@ A client MUST ignore options it doesn't know but MUST support at least the offic
 
 Official available *elliRPC* options are:
 
-| Option            | Description                                                                                                   |
-| ----------------- | ------------------------------------------------------------------------------------------------------------- |
-| @nullable         | The property value is allowed to be`null`.                                                                    |
-| @notEmpty         | The property value is not allowed to be empty. Empty values are lists without values,`null` or empty strings. |
-| @positive         | The property value MUST be a positive number.                                                                 |
-| @negative         | The property value MUST be a negative number.                                                                 |
-| @map              | The property does contain a key-value-map (object in json), where the key is a unique name for a value.       |
-| @list             | The property does contain a ordered list (array in json) of values.                                           |
-| @set              | The property does contain a unordered list (array in json) of values.                                         |
-| @language         | The property does contain a key-value map, where the key MUST be a language designator (ISO 639-1).           |
-| @extendedLanguage | The property does contain a key-value map, where the key MUST be a language designator (ISO 639-2/T).         |
-| @localized        | The property does contain a key-value map, where the key MUST be a region designator (ISO 3166-1).            |
-| @scripted         | The property does contain a key-value map, where the key MUST be a script designator (ISO 15924).             |
+| Option            | Description                                                                                                                                                                                  |
+|-------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| @id               | The property value is used as identifier for the object which contains the property.                                                                                                         |
+| @nullable         | The property value is allowed to be`null`. By default, without this option values are not allowed to be `null`.                                                                              |
+| @notEmpty         | The property value is not allowed to be empty. Empty values are lists without values and empty strings. `null` as value will be forbidden by default, if option `@nullable` is not set.      |
+| @positive         | The property value MUST be a positive number.                                                                                                                                                |
+| @negative         | The property value MUST be a negative number.                                                                                                                                                |
+| @map              | The property MUST contain a key-value-map (object in json), where the key is a unique name for a value.                                                                                      |
+| @list             | The property MUST contain a ordered list (array in json) of values.                                                                                                                          |
+| @set              | The property MUST contain a unordered list (array in json) of values.                                                                                                                        |
+| @language         | The property MUST contain a key-value map, where the key MUST be a language designator (ISO 639-1). Possible languages MAY be defined as comma seperated list: `@language(de,en,fr)`         |
+| @extendedLanguage | The property MUST contain a key-value map, where the key MUST be a language designator (ISO 639-2/T). Possible languages MAY be defined as comma seperated list: `@language(de-DE,en-GB)`    |
+| @localized        | The property MUST contain a key-value map, where the key MUST be a region designator (ISO 3166-1). Possible regions MAY be defined as comma seperated list: `@language(DE,GB)`               |
+| @scripted         | The property MUST contain a key-value map, where the key MUST be a script designator (ISO 15924). Possible script designators MAY be defined as comma seperated list: `@language(Latn,Latf)` |
+| @enum             | The property value MUST be one of the defined values. Possible values are defined as comma seperated list: `@enum(VALUE_1,VALUE_2)`                                                          |
+| @min              | The property value MUST be greater than or equal to the defined numeric value. Value is defined as follows: `@min(1)` or `@min(1.2)`                                                         |
+| @max              | The property value MUST be lower than or equal to the defined numeric value. Value is defined as follows: `@max(1)` or `@max(1.2)`                                                           |
+| @minLength        | The property value MUST be a string with string length greater than or equal to the defined value. Value is defined as follows: `@minLength(2)`                                              |
+| @maxLength        | The property value MUST be a string with string length lower than or equal to the defined numeric value. Value is defined as follows: `@maxLength(100)`                                      |
+| @regex            | The property value MUST match the given regular expression. Expression is defined as follows: `@regex(/^[A-Za-z]+$/)`                                                                        |
 
 ##### Option Chaining
 
