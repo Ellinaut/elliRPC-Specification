@@ -269,7 +269,7 @@ used.
 The `SchemaReferenceDefinition` is used to reference a schema which should be used to structure data.
 
 | Property | Type    | Description                                                                         |
-| -------- | ------- | ----------------------------------------------------------------------------------- |
+|----------|---------|-------------------------------------------------------------------------------------|
 | context  | ?string | The context if the schema isn't defined in the same package.                        |
 | schema   | string  | The case sensitive name of (internal or external) schema, which should be extended. |
 
@@ -284,7 +284,7 @@ used.
 The `SchemaDefinition` is used to describe how data MUST be structured into one or more properties.
 
 | Property    | Type                                                     | Description                                                                            |
-| ----------- | -------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+|-------------|----------------------------------------------------------|----------------------------------------------------------------------------------------|
 | name        | string                                                   | The name of the schema, which MUST be unique within a package.                         |
 | abstract    | boolean                                                  | Indicates that this schema can only be used with other schemas.                        |
 | extends     | ?[SchemaReferenceDefinition](#schemareferencedefinition) | The schema, which is extended with this schema.                                        |
@@ -296,7 +296,7 @@ The `SchemaDefinition` is used to describe how data MUST be structured into one 
 The `PropertyDefinition` is used to describe how a single property MUST be used within a schema.
 
 | Property    | Type                                              | Description                                                                                      |
-| ----------- | ------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+|-------------|---------------------------------------------------|--------------------------------------------------------------------------------------------------|
 | name        | string                                            | The property name used as key in request or response body, which MUST be unique within a schema. |
 | description | ?string                                           | The property description for documentation, COULD be parsed as markdown.                         |
 | type        | [PropertyTypeDefinition](#propertytypedefinition) | The property type definition.                                                                    |
@@ -306,7 +306,7 @@ The `PropertyDefinition` is used to describe how a single property MUST be used 
 The `PropertyTypeDefinition` is used to describe how a property look like and how it MUST be handled.
 
 | Property | Type     | Description                                                                              |
-| -------- | -------- | ---------------------------------------------------------------------------------------- |
+|----------|----------|------------------------------------------------------------------------------------------|
 | context  | ?string  | The context of the schema which is used as type or`null` for build-in types.             |
 | type     | string   | The case sensitive name of the build-in type, or the used (internal or external) schema. |
 | options  | string[] | A list of property options.                                                              |
@@ -329,6 +329,7 @@ These are the build-in property types of *elliRPC*. Additional types MAY be adde
 | decimal       | -                                                                                                                     |
 | boolean       | -                                                                                                                     |
 | email         | A string formatted as valid email address as defined by RFC 5322 and RFC 6530.                                        |
+| phoneNumber   | A string formatted as fully qualified telephone number (FQTN) defined by ITU-T E.164.                                 |
 | uri           | A string formatted as valid uri defined by RFC 3986.                                                                  |
 | dataUrl       | A string formatted as valid data url defined by RFC 2397.                                                             |
 | fileReference | A string formatted as valid uri to a file ressource.                                                                  |
@@ -361,7 +362,8 @@ Options MUST be applied in the order they are defined.
 Pre-defined *elliRPC* options MUST begin with an @ sign in the name and MAY have an impact on the JSON structure.
 
 Option MAY specify more details about itself. If an option specifies more details, details are provided in round
-brackets behind the option: `@option(details)`.
+brackets behind the option: `@option(details)`. "details" MAY be a single value or a comma seperated list of values. If
+a value is a set of values, this set is enclosed by square brackets: `@option(detail, [detail, detail])`.
 
 Options SHOULD be used by clients and servers to validate data structures before processing.
 
@@ -372,26 +374,26 @@ A client MUST ignore options it doesn't know but MUST support at least the offic
 
 Official available *elliRPC* options are:
 
-| Option            | Description                                                                                                                                                                                  |
-|-------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| @id               | The property value is used as identifier for the object which contains the property.                                                                                                         |
-| @nullable         | The property value is allowed to be`null`. By default, without this option values are not allowed to be `null`.                                                                              |
-| @notEmpty         | The property value is not allowed to be empty. Empty values are lists without values and empty strings. `null` as value will be forbidden by default, if option `@nullable` is not set.      |
-| @positive         | The property value MUST be a positive number.                                                                                                                                                |
-| @negative         | The property value MUST be a negative number.                                                                                                                                                |
-| @map              | The property MUST contain a key-value-map (object in json), where the key is a unique name for a value.                                                                                      |
-| @list             | The property MUST contain a ordered list (array in json) of values.                                                                                                                          |
-| @set              | The property MUST contain a unordered list (array in json) of values.                                                                                                                        |
-| @language         | The property MUST contain a key-value map, where the key MUST be a language designator (ISO 639-1). Possible languages MAY be defined as comma seperated list: `@language(de,en,fr)`         |
-| @extendedLanguage | The property MUST contain a key-value map, where the key MUST be a language designator (ISO 639-2/T). Possible languages MAY be defined as comma seperated list: `@language(de-DE,en-GB)`    |
-| @localized        | The property MUST contain a key-value map, where the key MUST be a region designator (ISO 3166-1). Possible regions MAY be defined as comma seperated list: `@language(DE,GB)`               |
-| @scripted         | The property MUST contain a key-value map, where the key MUST be a script designator (ISO 15924). Possible script designators MAY be defined as comma seperated list: `@language(Latn,Latf)` |
-| @enum             | The property value MUST be one of the defined values. Possible values are defined as comma seperated list: `@enum(VALUE_1,VALUE_2)`                                                          |
-| @min              | The property value MUST be greater than or equal to the defined numeric value. Value is defined as follows: `@min(1)` or `@min(1.2)`                                                         |
-| @max              | The property value MUST be lower than or equal to the defined numeric value. Value is defined as follows: `@max(1)` or `@max(1.2)`                                                           |
-| @minLength        | The property value MUST be a string with string length greater than or equal to the defined value. Value is defined as follows: `@minLength(2)`                                              |
-| @maxLength        | The property value MUST be a string with string length lower than or equal to the defined numeric value. Value is defined as follows: `@maxLength(100)`                                      |
-| @regex            | The property value MUST match the given regular expression. Expression is defined as follows: `@regex(/^[A-Za-z]+$/)`                                                                        |
+| Option            | Description                                                                                                                                                                                                                                                                            |
+|-------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| @id               | The property value is used as identifier for the object which contains the property.                                                                                                                                                                                                   |
+| @nullable         | The property value is allowed to be`null`. By default, without this option values are not allowed to be `null`.                                                                                                                                                                        |
+| @notEmpty         | The property value is not allowed to be empty. Empty values are lists without values and empty strings, so this option should only be used for type `string` or in combination any list or map option. `null` as value will be forbidden by default, if option `@nullable` is not set. |
+| @positive         | The property value MUST be a positive number.                                                                                                                                                                                                                                          |
+| @negative         | The property value MUST be a negative number.                                                                                                                                                                                                                                          |
+| @map              | The property MUST contain a key-value-map (object in json), where the key is a unique name for a value. The type and possible options for the key MAY be specified like: `@map(email)` or `@map(string, [@minLength(5), @maxLength(10)])`. Default type for the key is `string`.       |
+| @list             | The property MUST contain a ordered list (array in json) of values.                                                                                                                                                                                                                    |
+| @set              | The property MUST contain a unordered list (array in json) of values.                                                                                                                                                                                                                  |
+| @language         | The property MUST contain a key-value map, where the key MUST be a language designator (ISO 639-1). Possible languages MAY be defined as comma seperated list: `@language(de,en,fr)`                                                                                                   |
+| @extendedLanguage | The property MUST contain a key-value map, where the key MUST be a language designator (ISO 639-2/T). Possible languages MAY be defined as comma seperated list: `@language(de-DE,en-GB)`                                                                                              |
+| @localized        | The property MUST contain a key-value map, where the key MUST be a region designator (ISO 3166-1). Possible regions MAY be defined as comma seperated list: `@language(DE,GB)`                                                                                                         |
+| @scripted         | The property MUST contain a key-value map, where the key MUST be a script designator (ISO 15924). Possible script designators MAY be defined as comma seperated list: `@language(Latn,Latf)`                                                                                           |
+| @enum             | The property value MUST be one of the defined values. Possible values are defined as comma seperated list: `@enum(VALUE_1,VALUE_2)`                                                                                                                                                    |
+| @min              | The property value MUST be greater than or equal to the defined numeric value. Value is defined as follows: `@min(1)` or `@min(1.2)`                                                                                                                                                   |
+| @max              | The property value MUST be lower than or equal to the defined numeric value. Value is defined as follows: `@max(1)` or `@max(1.2)`                                                                                                                                                     |
+| @minLength        | The property value MUST be a string with string length greater than or equal to the defined value. Value is defined as follows: `@minLength(2)`. If whitespaces should be ignored for length validation, `true` could be defined as second details: `@minLength(2,true)`               |
+| @maxLength        | The property value MUST be a string with string length lower than or equal to the defined numeric value. Value is defined as follows: `@maxLength(100)`. If whitespaces should be ignored for length validation, `true` could be defined as second details: `@maxLength(2,true)`       |
+| @regex            | The property value MUST match the given regular expression. Expression is defined as follows: `@regex(/^[A-Za-z]+$/)`                                                                                                                                                                  |
 
 ##### Option Chaining
 
@@ -478,7 +480,7 @@ The following endpoints are defined by this specification, other endpoints MAY b
 specification.
 
 | Endpoint                                                   | HTTP method | URL path                   | Description                                                                               |
-| ---------------------------------------------------------- | ----------- | -------------------------- | ----------------------------------------------------------------------------------------- |
+|------------------------------------------------------------|-------------|----------------------------|-------------------------------------------------------------------------------------------|
 | [Get Documentation](#endpoint-get-documentation)           | GET         | /definitions               | This endpoint provides the full api definition.                                           |
 | [Get Package Definition](#endpoint-get-package-definition) | GET         | /definitions/{packageName} | This endpoint provides the definition for a single package.                               |
 | [Execute Procedure](#endpoint-execute-procedure)           | POST        | /procedures/execute        | This endpoint is used to execute a single procedure.                                      |
@@ -512,7 +514,7 @@ via HTTP method `GET`.
 ```
 
 | Property    | Type                                      | Description                                                                                    |
-| ----------- | ----------------------------------------- | ---------------------------------------------------------------------------------------------- |
+|-------------|-------------------------------------------|------------------------------------------------------------------------------------------------|
 | application | string                                    | The name of the application.                                                                   |
 | description | string or null                            | The description of the whole application. It COULD be parsed as markdown.                      |
 | extensions  | string[]                                  | A list of used specification extensions. Values MUST be URIs to their official specifications. |
@@ -647,7 +649,7 @@ status `415 Unsupported Media Type` and a single error object in the response bo
 The response body MUST be a valid json object structured like:
 
 | Property | Type                       | Description                                                                                           |
-| -------- | -------------------------- | ----------------------------------------------------------------------------------------------------- |
+|----------|----------------------------|-------------------------------------------------------------------------------------------------------|
 | success  | boolean                    | Indicator if procedure execution was successful or not.                                               |
 | data     | ?object                    | The procedure result data for the client, structured as defined by the procedure response definition. |
 | meta     | ?object                    | Additional meta data for the client, structured as defined by the procedure response definition.      |
