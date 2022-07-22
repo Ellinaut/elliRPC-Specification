@@ -26,6 +26,7 @@ Specification: elliRPC
         2. [Property Options](#property-options)
             1. [Option Chaining](#option-chaining)
 4. [Error Handling](#error-handling)
+   1. [Default Error Codes](#default-error-codes)
 5. [Versioning](#versioning)
 6. [Endpoints](#endpoints)
     1. [Endpoint: Get Documentation](#endpoint-get-documentation)
@@ -451,6 +452,20 @@ Here is how this would look like in JSON:
   "context": null
 }
 ```
+
+### Default Error Codes
+
+There are some error codes defined in this specification, which MAY be responded by the server without previously
+defining it as possible error for a procedure:
+
+- `not_found`: Indicates that required data for response was not found on the server.
+- `invalid_request`: Indicates that the given data does not match the defined schema or some values does not match
+  required format or allowed value range and a procedure can not be executed with the invalid data.
+- `server_error`: Indicates that something on the server went wrong while executing a procedure.
+- `not_authenticated`: Indicates that a user authentication is missing. This could happen if the application requires
+  authentication which is not part of this specification.
+- `not_allowed`: Indicates that the current user is not allowed to execute a procedure or to execute a procedure with
+  the given data. This could happen if the application requires authentication which is not part of this specification.
 
 ## Versioning
 
