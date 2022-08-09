@@ -910,12 +910,12 @@ This endpoint is used to retrieve a file from the server.
 
 This endpoint MUST be called via HTTP method `GET`.
 
-The url path for this endpoint MUST be `/elliRPC/files/{fileName}`.
+The url path for this endpoint MUST be `/files/{fileName}`.
 
 The `fileName` MUST contain a file extension separated by a point (`.`) at the end. For example: `test.jpg`.
 
 The `fileName` MAY contain directories, which allows duplicated file names in different directories. Directories and at
-least the file name MUST be separated by slashes (`/`). For example: `/elliRPC/files/testDirectory/test.jpg`.
+least the file name MUST be separated by slashes (`/`). For example: `/files/testDirectory/test.jpg`.
 
 The request MAY contain additional headers for example for caching or authorization, which are not parts of this
 specification. Unknown headers MUST be ignored by servers.
@@ -940,12 +940,12 @@ This endpoint MUST be called via HTTP method `POST` or `PUT`. If called via `POS
 if it does not already exist, otherwise an error will be happened. If called via `PUT` a file will be created on the
 server if it does not already exist, otherwise the existing file will be replaced with the new one.
 
-The url path for this endpoint MUST be `/elliRPC/files/{fileName}`.
+The url path for this endpoint MUST be `/files/{fileName}`.
 
 The `fileName` MUST contain a file extension separated by a point (`.`) at the end. For example: `test.jpg`.
 
 The `fileName` MAY contain directories, which allows duplicated file names in different directories. Directories and at
-least the file name MUST be separated by slashes (`/`). For example: `/elliRPC/files/testDirectory/test.jpg`.
+least the file name MUST be separated by slashes (`/`). For example: `/files/testDirectory/test.jpg`.
 
 The request MAY contain additional headers for example for authorization, which is not part of this specification.
 Unknown headers MUST be ignored by servers.
@@ -968,12 +968,12 @@ This endpoint is used to delete a file from the server.
 
 This endpoint MUST be called via HTTP method `DELETE`.
 
-The url path for this endpoint MUST be `/elliRPC/files/{fileName}`.
+The url path for this endpoint MUST be `/files/{fileName}`.
 
 The `fileName` MUST contain a file extension separated by a point (`.`) at the end. For example: `test.jpg`.
 
 The `fileName` MAY contain directories, which allows duplicated file names in different directories. Directories and at
-least the file name MUST be separated by slashes (`/`). For example: `/elliRPC/files/testDirectory/test.jpg`.
+least the file name MUST be separated by slashes (`/`). For example: `/files/testDirectory/test.jpg`.
 
 The request MAY contain additional headers for example for authorization, which is not part of this specification.
 Unknown headers MUST be ignored by servers.
